@@ -11,3 +11,16 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.configuration-warning {
+  padding-bottom: 1rem;
+  font-style: italic;
+}
+
+#root > div > div.accordion > div > h2 > button {
+  font-weight: bold;
+}
+
+#root > div > div.accordion > div > div > div > div > h2 > button {
+  font-weight: bold;
+}
