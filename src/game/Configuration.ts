@@ -96,7 +96,7 @@ export class Configuration {
                 maxDontComeBets: 3,
                 dontComeBetOddsStrategy: { type: OddsBetStrategyType.NONE, value: 1 },
                 rounding: RoundingType.DOLLAR,
-                simulationCount: 1_000_000
+                simulationCount: 10_000
             });
     }
 
