@@ -31,3 +31,59 @@ export function round(value: number, type: RoundingType): number {
     }
 }
 
+export function convertToTwoDecimalPlaceString(num: number) {
+    return (Math.round(num * 100) / 100).toFixed(2);
+}
+
+
+export function calculateOddsBetAmountAvoidRounding(plannedBet: number, dont: boolean, point: number): number {
+    if (!dont) {
+        //Pass or come bet odds calculation
+        switch (point) {
+            case 4:
+            case 10:
+                //The payout value will be calculated as 2*bet, so we just need a whole number.
+                return Math.ceil(plannedBet);
+            case 5:
+            case 9:
+                //The payout value will be calculated as 1.5*bet, so we need a number divisble by 2
+                return closestDisvisibleNumber(plannedBet, 2);
+            case 6:
+            case 8:
+                //The payout value will be calculated as 1.2*bet, so we need a number divisble by 5
+                return closestDisvisibleNumber(plannedBet, 5);
+            default:
+                throw new Error("Unexpected point value when calculating odds bet to avoid rounding: " + point);
+        }
+    } else {
+        //Don't pass or don't come bet odds calculation
+        switch (point) {
+            case 4:
+            case 10:
+                //The payout value will be calculated as bet / 2, so we need a number divisble by 2
+                return closestDisvisibleNumber(plannedBet, 2);
+            case 5:
+            case 9:
+                //The payout value will be calculated as bet * 2/3, so we need a number divisble by 3
+                return closestDisvisibleNumber(plannedBet, 3);
+            case 6:
+            case 8:
+                //The payout value will be calculated as bet*5/6, so we need a number divisble by 6
+                return closestDisvisibleNumber(plannedBet, 6);
+            default:
+                throw new Error("Unexpected point value when calculating odds bet to avoid rounding: " + point);
+        }
+    }
+}
+
+function closestDisvisibleNumber(original: number, divisor: number) {
+    //Check if it's already divisble
+    if (original % divisor === 0) {
+        //This is already divisible. Just use it
+        return original;
+    } else {
+        //Not already divisible, let's find the closet.
+        const quotient = Math.floor(original / divisor);
+        return divisor * (quotient + 1);
+    }
+}

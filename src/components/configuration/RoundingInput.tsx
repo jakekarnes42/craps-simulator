@@ -5,11 +5,12 @@ import { RoundingType } from '../../game/RoundingType';
 export type RoundingInputProps = {
     id: string,
     label: string,
+    enabled: boolean,
     rounding: RoundingType
     onChange: (newRounding: RoundingType) => void
 };
 
-const RoundingInput = ({ id, label, rounding, onChange }: RoundingInputProps): JSX.Element => {
+const RoundingInput = ({ id, label, enabled, rounding, onChange }: RoundingInputProps): JSX.Element => {
 
     return (
         <>
@@ -18,15 +19,15 @@ const RoundingInput = ({ id, label, rounding, onChange }: RoundingInputProps): J
             </div>
             <div className='mb-0'>
                 <ButtonGroup id={`${id}-buttongroup`}>
-                    <Form.Check.Input type='radio' bsPrefix='btn-check' checked={rounding === RoundingType.DOLLAR} readOnly />
-                    <Form.Check.Label bsPrefix='btn btn-outline-primary' onClick={(e) => { onChange(RoundingType.DOLLAR) }}>{RoundingType.DOLLAR}</Form.Check.Label>
-                    <Form.Check.Input type='radio' bsPrefix='btn-check' checked={rounding === RoundingType.CENT} readOnly />
-                    <Form.Check.Label bsPrefix='btn btn-outline-primary' onClick={(e) => { onChange(RoundingType.CENT) }}>{RoundingType.CENT}</Form.Check.Label>
+                    <Form.Check.Input type='radio' bsPrefix='btn-check' disabled={!enabled} checked={rounding === RoundingType.DOLLAR} readOnly/>
+                    <Form.Check.Label bsPrefix='btn btn-outline-primary' onClick={(e) => { if(enabled) onChange(RoundingType.DOLLAR) }}>{RoundingType.DOLLAR}</Form.Check.Label>
+                    <Form.Check.Input type='radio' bsPrefix='btn-check' disabled={!enabled} checked={rounding === RoundingType.CENT} readOnly />
+                    <Form.Check.Label bsPrefix='btn btn-outline-primary' onClick={(e) => { if(enabled) onChange(RoundingType.CENT) }}>{RoundingType.CENT}</Form.Check.Label>
                 </ButtonGroup>
             </div>
             <div className='mb-0'>
                 <small className="form-text text-muted" >
-                    This setting configures whether values are rounded to the nearest dollar or cent.
+                    {enabled ? 'This setting configures whether values are rounded to the nearest dollar or cent.' : 'Rounding is not applicable when bets are increased to avoid rounding.'}
                 </small>
             </div>
         </>

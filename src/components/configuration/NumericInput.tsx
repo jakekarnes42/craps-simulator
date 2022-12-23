@@ -6,7 +6,7 @@ export type NumericInputProps = {
     label: string,
     placeholder?: string,
     value?: number | null
-    helpText: string
+    helpText: string | JSX.Element,
     isValid: boolean,
     invalidText: string,
     handleChange: (val: number | null) => void

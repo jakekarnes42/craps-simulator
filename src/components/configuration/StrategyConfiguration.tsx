@@ -40,10 +40,13 @@ const StrategyConfiguration = ({ eventKey, configuration, setConfiguration }: St
                             id='passBetOdds'
                             label='Pass'
                             controllingBetValue={configuration.passBet}
+                            avoidRounding={configuration.avoidRounding}
+                            rounding={configuration.rounding}
                             strategy={configuration.passBetOddsStrategy}
                             onChange={(newStrategy: OddsBetStrategy) => {
                                 setConfiguration(configuration.setPassBetOddsStrategy(newStrategy));
                             }}
+                            dont={false}
                         />
                     </Accordion.Body>
                 </Accordion.Item>
@@ -77,10 +80,13 @@ const StrategyConfiguration = ({ eventKey, configuration, setConfiguration }: St
                             id='comeBetOdds'
                             label='Come'
                             controllingBetValue={configuration.comeBet}
+                            avoidRounding={configuration.avoidRounding}
+                            rounding={configuration.rounding}
                             strategy={configuration.comeBetOddsStrategy}
                             onChange={(newStrategy: OddsBetStrategy) => {
                                 setConfiguration(configuration.setComeBetOddsStrategy(newStrategy));
                             }}
+                            dont={false}
                         />
                     </Accordion.Body>
                 </Accordion.Item>
@@ -105,6 +111,8 @@ const StrategyConfiguration = ({ eventKey, configuration, setConfiguration }: St
                             id='dontPassBetOdds'
                             label="Don't Pass"
                             controllingBetValue={configuration.dontPassBet}
+                            avoidRounding={configuration.avoidRounding}
+                            rounding={configuration.rounding}
                             strategy={configuration.dontPassBetOddsStrategy}
                             onChange={(newStrategy: OddsBetStrategy) => {
                                 setConfiguration(configuration.setDontPassBetOddsStrategy(newStrategy));
@@ -143,6 +151,8 @@ const StrategyConfiguration = ({ eventKey, configuration, setConfiguration }: St
                             id='dontComeBetOdds'
                             label="Don't Come"
                             controllingBetValue={configuration.dontComeBet}
+                            avoidRounding={configuration.avoidRounding}
+                            rounding={configuration.rounding}
                             strategy={configuration.dontComeBetOddsStrategy}
                             onChange={(newStrategy: OddsBetStrategy) => {
                                 setConfiguration(configuration.setDontComeBetOddsStrategy(newStrategy));

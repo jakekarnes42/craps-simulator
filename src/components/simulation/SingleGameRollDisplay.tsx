@@ -42,8 +42,8 @@ function representBetCollection(currentBets: BetCollection): ReactNode {
 
   const passLineBetDisplay = currentBets.passLineBet ? <li>Pass Line Bet: ${currentBets.passLineBet.bet} {currentBets.passLineBet.odds ? <span> with odds: ${currentBets.passLineBet.odds}</span> : <></>}</li> : <></>;
   const dontPassBetDisplay = currentBets.dontPassBet ? <li>Don't Pass Bet: ${currentBets.dontPassBet.bet} {currentBets.dontPassBet.odds ? <span> with odds: ${currentBets.dontPassBet.odds}</span> : <></>}</li> : <></>;
-  const comeBetsDisplay = currentBets.comeBets.length > 0 ? currentBets.comeBets.map(comeBet => <li>Come Bet: ${comeBet.bet}. Come Point: {comeBet.comePoint ? comeBet.comePoint : "Not Set"} {comeBet.odds ? <span> With odds: ${comeBet.odds}</span> : <></>}</li>) : <></>;
-  const dontBetsDisplay = currentBets.dontComeBets.length > 0 ? currentBets.dontComeBets.map(dontComeBet => <li>Don't Come Bet: ${dontComeBet.bet}. Don't Come Point: {dontComeBet.comePoint ? dontComeBet.comePoint : "Not Set"} {dontComeBet.odds ? <span> With odds: ${dontComeBet.odds}</span> : <></>}</li>) : <></>;
+  const comeBetsDisplay = currentBets.comeBets.length > 0 ? currentBets.comeBets.map(comeBet => <li>Come Bet: ${comeBet.bet}. Come Point: {comeBet.comePoint ? comeBet.comePoint : "Not Set"}. {comeBet.odds ? <span> With odds: ${comeBet.odds}</span> : <></>}</li>) : <></>;
+  const dontBetsDisplay = currentBets.dontComeBets.length > 0 ? currentBets.dontComeBets.map(dontComeBet => <li>Don't Come Bet: ${dontComeBet.bet}. Don't Come Point: {dontComeBet.comePoint ? dontComeBet.comePoint : "Not Set"}. {dontComeBet.odds ? <span> With odds: ${dontComeBet.odds}</span> : <></>}</li>) : <></>;
   return (
     <div>
       <p className='mb-0'>All Current Bets: </p>

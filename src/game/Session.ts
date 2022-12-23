@@ -1,4 +1,4 @@
-import { round } from "../util/Util";
+import { round, calculateOddsBetAmountAvoidRounding } from "../util/Util";
 import { GameState } from "./GameState";
 import { OddsBetStrategy, OddsBetStrategyType } from "./OddsBetStrategy";
 import { RoundingType } from "./RoundingType";
@@ -77,6 +77,7 @@ function placeBets(initialState: GameState): { placedBetState: GameState, newBet
         const configuration = initialState.configuration;
         const isPointAlreadyOn = initialState.pointIsOn;
         const existingPoint = initialState.point;
+        const avoidRounding = configuration.avoidRounding;
         const rounding = configuration.rounding;
 
         //Gather mutable state 
@@ -98,7 +99,7 @@ function placeBets(initialState: GameState): { placedBetState: GameState, newBet
                     const passBetOddsStrategy = configuration.passBetOddsStrategy;
                     if (passBetOddsStrategy.type !== OddsBetStrategyType.NONE) {
                         //We're playing odds on the pass line. What's the amount?
-                        const passBetOddsAmount = calculateOddsBetAmount({ controllingBetValue: existingPassLineBet.bet, strategy: configuration.passBetOddsStrategy, rounding, dont: false, point: existingPoint });
+                        const passBetOddsAmount = calculateOddsBetAmount({ controllingBetValue: existingPassLineBet.bet, strategy: configuration.passBetOddsStrategy, avoidRounding, rounding, dont: false, point: existingPoint });
                         //Do we have enough to place it? 
                         if (bankroll - passBetOddsAmount >= 0) {
                             //Yes, we have enough to place the bet. Let's place it. 
@@ -124,7 +125,7 @@ function placeBets(initialState: GameState): { placedBetState: GameState, newBet
                     const dontPassBetOddsStrategy = configuration.dontPassBetOddsStrategy;
                     if (dontPassBetOddsStrategy.type !== OddsBetStrategyType.NONE) {
                         //We're playing odds on don't pass. What's the amount?
-                        const dontPassBetOddsAmount = calculateOddsBetAmount({ controllingBetValue: existingDontPassBet.bet, strategy: configuration.dontPassBetOddsStrategy, rounding, dont: true, point: existingPoint });
+                        const dontPassBetOddsAmount = calculateOddsBetAmount({ controllingBetValue: existingDontPassBet.bet, strategy: configuration.dontPassBetOddsStrategy, avoidRounding, rounding, dont: true, point: existingPoint });
                         //Do we have enough to place it? 
                         if (bankroll - dontPassBetOddsAmount >= 0) {
                             //Yes, we have enough to place the bet. Let's place it. 
@@ -151,7 +152,7 @@ function placeBets(initialState: GameState): { placedBetState: GameState, newBet
                     const comeBetOddsStrategy = configuration.comeBetOddsStrategy;
                     if (comeBetOddsStrategy.type !== OddsBetStrategyType.NONE) {
                         //We're playing odds on the come bet. What's the amount?
-                        const comeBetOddsAmount = calculateOddsBetAmount({ controllingBetValue: comeBet.bet, strategy: configuration.comeBetOddsStrategy, rounding, dont: false, point: comeBet.comePoint });
+                        const comeBetOddsAmount = calculateOddsBetAmount({ controllingBetValue: comeBet.bet, strategy: configuration.comeBetOddsStrategy, avoidRounding, rounding, dont: false, point: comeBet.comePoint });
                         //Do we have enough to place it? 
                         if (bankroll - comeBetOddsAmount >= 0) {
                             //Yes, we have enough to place the bet. Let's place it. 
@@ -182,7 +183,7 @@ function placeBets(initialState: GameState): { placedBetState: GameState, newBet
                     const dontComeBetOddsStrategy = configuration.dontComeBetOddsStrategy;
                     if (dontComeBetOddsStrategy.type !== OddsBetStrategyType.NONE) {
                         //We're playing odds on the don't come bet. What's the amount?
-                        const dontComeBetOddsAmount = calculateOddsBetAmount({ controllingBetValue: dontComeBet.bet, strategy: configuration.dontComeBetOddsStrategy, rounding, dont: true, point: dontComeBet.comePoint });
+                        const dontComeBetOddsAmount = calculateOddsBetAmount({ controllingBetValue: dontComeBet.bet, strategy: configuration.dontComeBetOddsStrategy, avoidRounding, rounding, dont: true, point: dontComeBet.comePoint });
                         //Do we have enough to place it? 
                         if (bankroll - dontComeBetOddsAmount >= 0) {
                             //Yes, we have enough to place the bet. Let's place it. 
@@ -281,12 +282,27 @@ function placeBets(initialState: GameState): { placedBetState: GameState, newBet
     }
 }
 
-function calculateOddsBetAmount({ controllingBetValue, strategy, rounding, dont, point }: { controllingBetValue: number; strategy: OddsBetStrategy; rounding: RoundingType; dont: boolean; point?: number }): number {
+function calculateOddsBetAmount({ controllingBetValue, strategy, avoidRounding, rounding, dont, point }: { controllingBetValue: number; strategy: OddsBetStrategy; avoidRounding: boolean, rounding: RoundingType; dont: boolean; point: number }): number {
     switch (strategy.type) {
         case OddsBetStrategyType.NONE: return 0;
-        case OddsBetStrategyType.SETAMOUNT: return round(strategy.value, rounding);
-        case OddsBetStrategyType.MULTIPLIER: return round(strategy.value * controllingBetValue, rounding);
+        case OddsBetStrategyType.SETAMOUNT: {
+            if(avoidRounding){
+                const plannedBet = strategy.value;
+                return calculateOddsBetAmountAvoidRounding(plannedBet, dont, point);
+            } else {
+                return round(strategy.value, rounding);
+            }
+        }
+        case OddsBetStrategyType.MULTIPLIER: {
+            if(avoidRounding){
+                const plannedBet = strategy.value * controllingBetValue;
+                return calculateOddsBetAmountAvoidRounding(plannedBet, dont, point);
+            } else {
+                return round(strategy.value * controllingBetValue, rounding);
+            }
+        }
         case OddsBetStrategyType.TABLEMAX: {
+            //We don't need to worry about avoiding rounding here because the table max will always have round payouts
             if (dont) {
                 return round(6 * controllingBetValue, rounding);
             } else {
@@ -785,6 +801,8 @@ function rollDie() {
 function getRandomInt(max: number) {
     return Math.floor(Math.random() * max);
 }
+
+
 
 
 

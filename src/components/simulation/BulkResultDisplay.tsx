@@ -1,7 +1,7 @@
 
 import { RollResult } from '../../game/Session';
 import { SingleGameRollDisplay } from './SingleGameRollDisplay';
-import { rollsToReadableDuration, TableSpeed } from '../../util/Util';
+import { convertToTwoDecimalPlaceString, rollsToReadableDuration, TableSpeed } from '../../util/Util';
 import { LimitReached, GameState } from '../../game/GameState';
 
 type BulkResultDisplayProps = {
@@ -17,13 +17,18 @@ export const BulkResultDisplay = ({ results }: BulkResultDisplayProps) => {
 
 
   const medianRollNum = median(results.map(result => result.rollNum));
+
+  function convertToPercentageString(num: number) {
+    return convertToTwoDecimalPlaceString(num * 100) + '%';
+  }
+
   return (
     <div>
       <h3>Number of Simulated Sessions: {totalCount}</h3>
-      <h3>Percentage of {LimitReached.BANKROLL_MAX}: {(results.filter(result => result.limitReached() === LimitReached.BANKROLL_MAX).length / totalCount) * 100}%</h3>
-      <h3>Percentage of {LimitReached.BANKROLL_MIN}: {(results.filter(result => result.limitReached() === LimitReached.BANKROLL_MIN).length / totalCount) * 100}%</h3>
-      <h3>Percentage of {LimitReached.BUSTED}: {(results.filter(result => result.limitReached() === LimitReached.BUSTED).length / totalCount) * 100}%</h3>
-      <h3>Percentage of {LimitReached.MAX_ROLLS}: {(results.filter(result => result.limitReached() === LimitReached.MAX_ROLLS).length / totalCount) * 100}%</h3>
+      <h3>Percentage of {LimitReached.BANKROLL_MAX}: {convertToPercentageString((results.filter(result => result.limitReached() === LimitReached.BANKROLL_MAX).length / totalCount)) }</h3>
+      <h3>Percentage of {LimitReached.BANKROLL_MIN}: {convertToPercentageString((results.filter(result => result.limitReached() === LimitReached.BANKROLL_MIN).length / totalCount))}</h3>
+      <h3>Percentage of {LimitReached.BUSTED}: {convertToPercentageString((results.filter(result => result.limitReached() === LimitReached.BUSTED).length / totalCount))}</h3>
+      <h3>Percentage of {LimitReached.MAX_ROLLS}: {convertToPercentageString((results.filter(result => result.limitReached() === LimitReached.MAX_ROLLS).length / totalCount))}</h3>
       <h3>Median number of rolls: {medianRollNum}
         <h5 className='mt-1'>
           <ul>

@@ -4,6 +4,8 @@ import RoundingInput from './RoundingInput';
 import { RoundingType } from "../../game/RoundingType";
 import { Configuration } from '../../game/Configuration';
 import NumericInput from './NumericInput';
+import { Form } from 'react-bootstrap';
+import BooleanSwitchInput from './BooleanSwitchInput';
 
 export type GameConfigurationProps = {
     eventKey: string,
@@ -17,9 +19,18 @@ const GameConfiguration = ({ eventKey, configuration, setConfiguration }: GameCo
         <Accordion.Item eventKey={eventKey}>
             <Accordion.Header>Game Configuration</Accordion.Header>
             <Accordion.Body>
+                <BooleanSwitchInput
+                    id="avoidRoundingInput"
+                    label="Increase Bet to Avoid Rounding"
+                    value={configuration.avoidRounding}
+                    onChange={(newValue: boolean) => {
+                        setConfiguration(configuration.setAvoidRounding(newValue));
+                    }}
+                />
                 <RoundingInput
                     id="roundingInput"
                     label="Rounding"
+                    enabled={!configuration.avoidRounding}
                     rounding={configuration.rounding}
                     onChange={(newValue: RoundingType) => {
                         setConfiguration(configuration.setRounding(newValue));

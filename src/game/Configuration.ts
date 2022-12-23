@@ -17,6 +17,7 @@ interface ConfigurationProps {
     dontComeBet: number | null;
     maxDontComeBets: number;
     dontComeBetOddsStrategy: OddsBetStrategy;
+    avoidRounding: boolean;
     rounding: RoundingType;
     simulationCount: number | null;
 }
@@ -36,6 +37,7 @@ export class Configuration {
     readonly dontComeBet: number | null;
     readonly maxDontComeBets: number;
     readonly dontComeBetOddsStrategy: OddsBetStrategy;
+    readonly avoidRounding: boolean;
     readonly rounding: RoundingType;
     readonly simulationCount: number | null;
 
@@ -55,9 +57,11 @@ export class Configuration {
             dontComeBet,
             maxDontComeBets,
             dontComeBetOddsStrategy,
+            avoidRounding,
             rounding,
             simulationCount
         }: ConfigurationProps) {
+        this.avoidRounding = avoidRounding;
         this.rounding = rounding;
 
         this.initialBankroll = initialBankroll ? round(initialBankroll, rounding) : initialBankroll;
@@ -95,6 +99,7 @@ export class Configuration {
                 dontComeBet: null,
                 maxDontComeBets: 3,
                 dontComeBetOddsStrategy: { type: OddsBetStrategyType.NONE, value: 1 },
+                avoidRounding: true,
                 rounding: RoundingType.DOLLAR,
                 simulationCount: 10_000
             });
@@ -156,6 +161,10 @@ export class Configuration {
 
     public setDontComeBetOddsStrategy(value: OddsBetStrategy): Configuration {
         return new Configuration(Object.assign(this, { dontComeBetOddsStrategy: value }));
+    }
+
+    public setAvoidRounding(value: boolean): Configuration {
+        return new Configuration(Object.assign(this, { avoidRounding: value }));
     }
 
     public setRounding(value: RoundingType): Configuration {

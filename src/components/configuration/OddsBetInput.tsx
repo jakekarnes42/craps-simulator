@@ -2,17 +2,21 @@ import { ButtonGroup } from 'react-bootstrap';
 import Form from 'react-bootstrap/Form';
 import NumericInput from './NumericInput';
 import { OddsBetStrategy, OddsBetStrategyType } from '../../game/OddsBetStrategy';
+import { RoundingType } from '../../game/RoundingType';
+import { calculateOddsBetAmountAvoidRounding, convertToTwoDecimalPlaceString, round } from '../../util/Util';
 
 export type OddsBetInputProps = {
     id: string,
     label: string,
-    controllingBetValue: number | null
+    controllingBetValue: number | null,
+    avoidRounding: boolean,
+    rounding: RoundingType,
     strategy: OddsBetStrategy,
     onChange: (newStrategy: OddsBetStrategy) => void,
-    dont?: boolean
+    dont: boolean
 };
 
-const OddsBetInput = ({ id, label, controllingBetValue, strategy, onChange, dont }: OddsBetInputProps): JSX.Element => {
+const OddsBetInput = ({ id, label, controllingBetValue, avoidRounding, rounding, strategy, onChange, dont }: OddsBetInputProps): JSX.Element => {
     const isDisabled = controllingBetValue == null;
 
     let additionalContextElement: JSX.Element;
@@ -28,12 +32,30 @@ const OddsBetInput = ({ id, label, controllingBetValue, strategy, onChange, dont
                 </small>);
                 break;
             case OddsBetStrategyType.SETAMOUNT:
+                var helpText: string|JSX.Element;
+                if(avoidRounding){
+                    helpText =  (
+                        <>
+                            <p className='mb-0'>The odds bet may vary slightly to avoid rounding.  Based on the current {label.toLocaleLowerCase()} bet value of ${controllingBetValue}, the player will make the following {label.toLocaleLowerCase()} odds bets:</p>
+                            <ul>
+                                <li>If the point is 4 or 10, bet ${calculateOddsBetAmountAvoidRounding(strategy.value, dont, 4)}</li>
+                                <li>If the point is 5 or 9, bet ${calculateOddsBetAmountAvoidRounding(strategy.value, dont, 5)}</li>
+                                <li>If the point is 6 or 8, bet ${calculateOddsBetAmountAvoidRounding(strategy.value, dont, 6)}</li>
+                            </ul>
+                        </>
+                    );
+                } else {
+                    const roundedAmount = round(strategy.value, rounding);
+                    const roundedAmountText = rounding === RoundingType.CENT ? convertToTwoDecimalPlaceString(roundedAmount) : roundedAmount;
+                    helpText =  `The player will bet the following amount for each ${label.toLocaleLowerCase()} odds bet: $${roundedAmountText}.`;
+                }
+
                 additionalContextElement = (
                     <NumericInput
                         controlId={`${id}-amount`}
                         label={`${label} Odds Bet Amount`}
                         value={strategy.value}
-                        helpText={`The player will bet the following amount for each ${label.toLocaleLowerCase()} odds bet: $${strategy.value}`}
+                        helpText={helpText}
                         isValid={strategy.value > 0}
                         invalidText='Must be a numeric value greater than 0.'
                         handleChange={(newValue: number | null) => {
@@ -47,12 +69,32 @@ const OddsBetInput = ({ id, label, controllingBetValue, strategy, onChange, dont
                 );
                 break;
             case OddsBetStrategyType.MULTIPLIER:
+                    
+                const desiredBet = strategy.value * controllingBetValue;
+                var helpText: string|JSX.Element;
+                if(avoidRounding){
+                    helpText =  (
+                        <>
+                            <p className='mb-0'>The odds bet may vary slightly to avoid rounding. Based on the current {label.toLocaleLowerCase()} bet value of ${controllingBetValue}, the player will make the following {label.toLocaleLowerCase()} odds bets:</p>
+                            <ul>
+                                <li>If the point is 4 or 10, bet ${calculateOddsBetAmountAvoidRounding(desiredBet, dont, 4)}</li>
+                                <li>If the point is 5 or 9, bet ${calculateOddsBetAmountAvoidRounding(desiredBet, dont, 5)}</li>
+                                <li>If the point is 6 or 8, bet ${calculateOddsBetAmountAvoidRounding(desiredBet, dont, 6)}</li>
+                            </ul>
+                        </>
+                    );
+                } else {
+                    const roundedAmount = round(desiredBet, rounding);
+                    const roundedAmountText = rounding === RoundingType.CENT ? convertToTwoDecimalPlaceString(roundedAmount) : roundedAmount;
+                    helpText = `The player will multiply the current ${label.toLocaleLowerCase()} bet of $${controllingBetValue} by ${strategy.value} when placing ${label.toLocaleLowerCase()} odds bet. The maximum ${label.toLocaleLowerCase()} odds bet will be: $${roundedAmountText}`;
+                }
+                        
                 additionalContextElement = (
                     <NumericInput
                         controlId={`${id}-multiplier`}
                         label={`${label} Odds Bet Multiplier`}
                         value={strategy.value}
-                        helpText={`The player will multiply the current ${label.toLocaleLowerCase()} bet of $${controllingBetValue} by ${strategy.value} when placing ${label.toLocaleLowerCase()} odds bet. The maximum ${label.toLocaleLowerCase()} odds bet will be: $${strategy.value * controllingBetValue}`}
+                        helpText={helpText}
                         isValid={strategy.value > 0}
                         invalidText='Must be a numeric value greater than 0.'
                         handleChange={(newValue: number | null) => {
