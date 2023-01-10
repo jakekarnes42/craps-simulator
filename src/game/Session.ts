@@ -77,6 +77,8 @@ function placeBets(initialState: GameState): { placedBetState: GameState, newBet
         const configuration = initialState.configuration;
         const isPointAlreadyOn = initialState.pointIsOn;
         const existingPoint = initialState.point;
+        const comeBetOddsWorkingComeOut = configuration.comeBetOddsWorkingComeOut;
+        const dontComeBetOddsWorkingComeOut = configuration.dontComeBetOddsWorkingComeOut;
         const avoidRounding = configuration.avoidRounding;
         const rounding = configuration.rounding;
 
@@ -148,20 +150,24 @@ function placeBets(initialState: GameState): { placedBetState: GameState, newBet
             if (comeBet.comePoint !== null) {
                 //The come point is established. Check if there are already odds. 
                 if (comeBet.odds === null) {
-                    //No existing odds. We could lay odds. What's the odds strategy?
-                    const comeBetOddsStrategy = configuration.comeBetOddsStrategy;
-                    if (comeBetOddsStrategy.type !== OddsBetStrategyType.NONE) {
-                        //We're playing odds on the come bet. What's the amount?
-                        const comeBetOddsAmount = calculateOddsBetAmount({ controllingBetValue: comeBet.bet, strategy: configuration.comeBetOddsStrategy, avoidRounding, rounding, dont: false, point: comeBet.comePoint });
-                        //Do we have enough to place it? 
-                        if (bankroll - comeBetOddsAmount >= 0) {
-                            //Yes, we have enough to place the bet. Let's place it. 
-                            //Deduct the bet amount from our bankroll
-                            bankroll -= comeBetOddsAmount;
-                            //Update our current bet to add odds. 
-                            comeBet.odds = comeBetOddsAmount;
-                            //Track the newly placed bet
-                            newBets.push({ type: BetType.COME_ODDS, bet: comeBetOddsAmount });
+                    //No existing odds. We could take odds. But if the point is off, we may not want to lay odds. 
+                    if (isPointAlreadyOn || comeBetOddsWorkingComeOut) {
+                        //Either the point is on, or we do want our come bet odds working. Continue.
+                        //What's the odds strategy?
+                        const comeBetOddsStrategy = configuration.comeBetOddsStrategy;
+                        if (comeBetOddsStrategy.type !== OddsBetStrategyType.NONE) {
+                            //We're playing odds on the come bet. What's the amount?
+                            const comeBetOddsAmount = calculateOddsBetAmount({ controllingBetValue: comeBet.bet, strategy: configuration.comeBetOddsStrategy, avoidRounding, rounding, dont: false, point: comeBet.comePoint });
+                            //Do we have enough to place it? 
+                            if (bankroll - comeBetOddsAmount >= 0) {
+                                //Yes, we have enough to place the bet. Let's place it. 
+                                //Deduct the bet amount from our bankroll
+                                bankroll -= comeBetOddsAmount;
+                                //Update our current bet to add odds. 
+                                comeBet.odds = comeBetOddsAmount;
+                                //Track the newly placed bet
+                                newBets.push({ type: BetType.COME_ODDS, bet: comeBetOddsAmount });
+                            }
                         }
                     }
                 }
@@ -179,20 +185,24 @@ function placeBets(initialState: GameState): { placedBetState: GameState, newBet
             if (dontComeBet.comePoint !== null) {
                 //The don't come point is established. Check if there are already odds. 
                 if (dontComeBet.odds === null) {
-                    //No existing odds. We could lay odds. What's the odds strategy?
-                    const dontComeBetOddsStrategy = configuration.dontComeBetOddsStrategy;
-                    if (dontComeBetOddsStrategy.type !== OddsBetStrategyType.NONE) {
-                        //We're playing odds on the don't come bet. What's the amount?
-                        const dontComeBetOddsAmount = calculateOddsBetAmount({ controllingBetValue: dontComeBet.bet, strategy: configuration.dontComeBetOddsStrategy, avoidRounding, rounding, dont: true, point: dontComeBet.comePoint });
-                        //Do we have enough to place it? 
-                        if (bankroll - dontComeBetOddsAmount >= 0) {
-                            //Yes, we have enough to place the bet. Let's place it. 
-                            //Deduct the bet amount from our bankroll
-                            bankroll -= dontComeBetOddsAmount;
-                            //Update our current bet to add odds. 
-                            dontComeBet.odds = dontComeBetOddsAmount;
-                            //Track the newly placed bet
-                            newBets.push({ type: BetType.DONTCOME_ODDS, bet: dontComeBetOddsAmount });
+                    //No existing odds. We could take odds. But if the point is off, we may not want to lay odds. 
+                    if (isPointAlreadyOn || dontComeBetOddsWorkingComeOut) {
+                        //Either the point is on, or we do want our don't come bet odds working. Continue.
+                        //What's the odds strategy?
+                        const dontComeBetOddsStrategy = configuration.dontComeBetOddsStrategy;
+                        if (dontComeBetOddsStrategy.type !== OddsBetStrategyType.NONE) {
+                            //We're playing odds on the don't come bet. What's the amount?
+                            const dontComeBetOddsAmount = calculateOddsBetAmount({ controllingBetValue: dontComeBet.bet, strategy: configuration.dontComeBetOddsStrategy, avoidRounding, rounding, dont: true, point: dontComeBet.comePoint });
+                            //Do we have enough to place it? 
+                            if (bankroll - dontComeBetOddsAmount >= 0) {
+                                //Yes, we have enough to place the bet. Let's place it. 
+                                //Deduct the bet amount from our bankroll
+                                bankroll -= dontComeBetOddsAmount;
+                                //Update our current bet to add odds. 
+                                dontComeBet.odds = dontComeBetOddsAmount;
+                                //Track the newly placed bet
+                                newBets.push({ type: BetType.DONTCOME_ODDS, bet: dontComeBetOddsAmount });
+                            }
                         }
                     }
                 }
@@ -286,7 +296,7 @@ function calculateOddsBetAmount({ controllingBetValue, strategy, avoidRounding, 
     switch (strategy.type) {
         case OddsBetStrategyType.NONE: return 0;
         case OddsBetStrategyType.SETAMOUNT: {
-            if(avoidRounding){
+            if (avoidRounding) {
                 const plannedBet = strategy.value;
                 return calculateOddsBetAmountAvoidRounding(plannedBet, dont, point);
             } else {
@@ -294,7 +304,7 @@ function calculateOddsBetAmount({ controllingBetValue, strategy, avoidRounding, 
             }
         }
         case OddsBetStrategyType.MULTIPLIER: {
-            if(avoidRounding){
+            if (avoidRounding) {
                 const plannedBet = strategy.value * controllingBetValue;
                 return calculateOddsBetAmountAvoidRounding(plannedBet, dont, point);
             } else {
@@ -327,6 +337,8 @@ function calculateOddsBetAmount({ controllingBetValue, strategy, avoidRounding, 
 function resolveBets(placedBetState: GameState, roll: number): { resultingState: GameState, resolvedBets: Array<ResolvedBet> } {
     //Extract out some helpful, static values
     const rounding = placedBetState.configuration.rounding;
+    const comeBetOddsWorkingComeOut = placedBetState.configuration.comeBetOddsWorkingComeOut;
+    const dontComeBetOddsWorkingComeOut = placedBetState.configuration.dontComeBetOddsWorkingComeOut;
 
     //Gather mutable state 
     let bankroll = placedBetState.bankroll;
@@ -447,31 +459,44 @@ function resolveBets(placedBetState: GameState, roll: number): { resultingState:
                 //Track the come bet win
                 resolvedBets.push({ placedBet: { type: BetType.COME, bet: comeBet.bet }, outcome: BetOutcome.WIN, payout: comeBet.bet });
 
+                //Check if we have an odds bet
                 if (comeBet.odds) {
-                    let payout = 0;
-                    switch (point) {
-                        case 4:
-                        case 10:
-                            payout = round(2 * comeBet.odds, rounding);
-                            break;
-                        case 5:
-                        case 9:
-                            payout = round(1.5 * comeBet.odds, rounding);
-                            break;
-                        case 6:
-                        case 8:
-                            payout = round(1.2 * comeBet.odds, rounding);
-                            break;
+                    //Handle our come bet odds. Check if it was working
+                    if (pointIsOn || comeBetOddsWorkingComeOut) {
+                        //The point is on or our come odds bet is working during the come out. The bet is working. 
+                        let payout = 0;
+                        switch (comeBet.comePoint) {
+                            case 4:
+                            case 10:
+                                payout = round(2 * comeBet.odds, rounding);
+                                break;
+                            case 5:
+                            case 9:
+                                payout = round(1.5 * comeBet.odds, rounding);
+                                break;
+                            case 6:
+                            case 8:
+                                payout = round(1.2 * comeBet.odds, rounding);
+                                break;
+                        }
+                        //Add our winnings
+                        bankroll += payout;
+
+                        //Return original come odds bet
+                        bankroll += comeBet.odds;
+
+                        //Track the come odds bet win
+                        resolvedBets.push({ placedBet: { type: BetType.COME_ODDS, bet: comeBet.odds }, outcome: BetOutcome.WIN, payout });
+                    } else {
+                        //The bet isn't currently working. Even though we won, odds are simply returned to us. Call it a push.
+                        //Return original come odds bet
+                        bankroll += comeBet.odds;
+
+                        //Track the come odds bet push
+                        resolvedBets.push({ placedBet: { type: BetType.COME_ODDS, bet: comeBet.odds }, outcome: BetOutcome.PUSH, payout: comeBet.odds });
                     }
-                    //Add our winnings
-                    bankroll += payout;
-
-                    //Return original come odds bet
-                    bankroll += comeBet.odds;
-
-                    //Track the come odds bet win
-                    resolvedBets.push({ placedBet: { type: BetType.COME_ODDS, bet: comeBet.odds }, outcome: BetOutcome.WIN, payout });
                 }
+
 
                 //Intentionally do not add this to our updated come bets array to clear that bet
             } else if (roll === 7) {
@@ -481,10 +506,21 @@ function resolveBets(placedBetState: GameState, roll: number): { resultingState:
                 //Track the lost come bet
                 resolvedBets.push({ placedBet: { type: BetType.COME, bet: comeBet.bet }, outcome: BetOutcome.LOSS, payout: 0 });
 
-                //Check if there was an odds bet
+                //Check if we have an odds bet
                 if (comeBet.odds) {
-                    //Track the lost come odds bet 
-                    resolvedBets.push({ placedBet: { type: BetType.COME_ODDS, bet: comeBet.odds }, outcome: BetOutcome.LOSS, payout: 0 });
+                    //Handle our come bet odds. Check if it was working
+                    if (pointIsOn || comeBetOddsWorkingComeOut) {
+                        //The point is on or our come odds bet is working during the come out. The bet is working. 
+                        //Track the lost come odds bet 
+                        resolvedBets.push({ placedBet: { type: BetType.COME_ODDS, bet: comeBet.odds }, outcome: BetOutcome.LOSS, payout: 0 });
+                    } else {
+                        //The bet isn't currently working. Even though we lost, odds are simply returned to us. Call it a push.
+                        //Return original come odds bet
+                        bankroll += comeBet.odds;
+
+                        //Track the come odds bet push
+                        resolvedBets.push({ placedBet: { type: BetType.COME_ODDS, bet: comeBet.odds }, outcome: BetOutcome.PUSH, payout: comeBet.odds });
+                    }
                 }
 
                 //Intentionally do not add this to our updated come bets array to clear the bet
@@ -493,7 +529,7 @@ function resolveBets(placedBetState: GameState, roll: number): { resultingState:
                 updatedComeBets.push({ ...comeBet });
             }
         } else {
-            //We have a come bet and the point is off. Come out roll.
+            //We have a come bet and the come point is off. "Come out roll" for the come bet.
             switch (roll) {
                 case 7:
                 case 11:
@@ -647,46 +683,68 @@ function resolveBets(placedBetState: GameState, roll: number): { resultingState:
                 //Track the come bet win
                 resolvedBets.push({ placedBet: { type: BetType.DONTCOME, bet: dontComeBet.bet }, outcome: BetOutcome.WIN, payout: dontComeBet.bet });
 
-
+                //Check if we have an odds bet
                 if (dontComeBet.odds) {
-                    let payout = 0;
-                    switch (point) {
-                        case 4:
-                        case 10:
-                            payout = round((dontComeBet.odds) / 2, rounding);
-                            break;
-                        case 5:
-                        case 9:
-                            payout = round((dontComeBet.odds * 2) / 3, rounding);
-                            break;
-                        case 6:
-                        case 8:
-                            payout = round((dontComeBet.odds * 5) / 6, rounding);
-                            break;
+                    //Handle our dont come bet odds. Check if it was working
+                    if (pointIsOn || dontComeBetOddsWorkingComeOut) {
+                        //The point is on or our don't come odds bet is working during the come out. The bet is working. 
+                        let payout = 0;
+                        switch (dontComeBet.comePoint) {
+                            case 4:
+                            case 10:
+                                payout = round((dontComeBet.odds) / 2, rounding);
+                                break;
+                            case 5:
+                            case 9:
+                                payout = round((dontComeBet.odds * 2) / 3, rounding);
+                                break;
+                            case 6:
+                            case 8:
+                                payout = round((dontComeBet.odds * 5) / 6, rounding);
+                                break;
+                        }
+                        //Add our winnings
+                        bankroll += payout;
+
+                        //Return original come odds bet
+                        bankroll += dontComeBet.odds;
+
+                        //Track the come odds bet win
+                        resolvedBets.push({ placedBet: { type: BetType.DONTCOME_ODDS, bet: dontComeBet.odds }, outcome: BetOutcome.WIN, payout });
+                    } else {
+                        //The bet isn't currently working. Even though we won, odds are simply returned to us. Call it a push.
+                        //Return original don't come odds bet
+                        bankroll += dontComeBet.odds;
+
+                        //Track the don't come odds bet push
+                        resolvedBets.push({ placedBet: { type: BetType.DONTCOME_ODDS, bet: dontComeBet.odds }, outcome: BetOutcome.PUSH, payout: dontComeBet.odds });
                     }
-                    //Add our winnings
-                    bankroll += payout;
-
-                    //Return original come odds bet
-                    bankroll += dontComeBet.odds;
-
-                    //Track the come odds bet win
-                    resolvedBets.push({ placedBet: { type: BetType.DONTCOME_ODDS, bet: dontComeBet.odds }, outcome: BetOutcome.WIN, payout });
                 }
 
                 //Intentionally do not add this to our updated come bets array to clear that bet
 
             } else if (roll === dontComeBet.comePoint) {
-                //Point is on and the point was rolled. LOSS for don't come
+                //Don't come point is set and the point was rolled. LOSS for don't come
                 //The bet was already deducted so we don't need to update the bankroll
 
                 //Track the lost come bet
                 resolvedBets.push({ placedBet: { type: BetType.DONTCOME, bet: dontComeBet.bet }, outcome: BetOutcome.LOSS, payout: 0 });
 
-                //Check if there was an odds bet
+                //Check if we have an odds bet
                 if (dontComeBet.odds) {
-                    //Track the lost don't come odds bet 
-                    resolvedBets.push({ placedBet: { type: BetType.DONTCOME_ODDS, bet: dontComeBet.odds }, outcome: BetOutcome.LOSS, payout: 0 });
+                    //Handle our don't come bet odds. Check if it was working
+                    if (pointIsOn || dontComeBetOddsWorkingComeOut) {
+                        //The point is on or our don't come odds bet is working during the come out. The bet is working. 
+                        //Track the lost don't come odds bet 
+                        resolvedBets.push({ placedBet: { type: BetType.DONTCOME_ODDS, bet: dontComeBet.odds }, outcome: BetOutcome.LOSS, payout: 0 });
+                    } else {
+                        //The bet isn't currently working. Even though we lost, odds are simply returned to us. Call it a push.
+                        //Return original don't come odds bet
+                        bankroll += dontComeBet.odds;
+
+                        //Track the come odds bet push
+                        resolvedBets.push({ placedBet: { type: BetType.DONTCOME_ODDS, bet: dontComeBet.odds }, outcome: BetOutcome.PUSH, payout: dontComeBet.odds });
+                    }
                 }
 
                 //Intentionally do not add this to our updated don't come bets array to clear the bet
@@ -695,7 +753,7 @@ function resolveBets(placedBetState: GameState, roll: number): { resultingState:
                 updatedDontComeBets.push({ ...dontComeBet });
             }
         } else {
-            //We have a don't come bet and the point is off. Come out roll.
+            //We have a don't come bet and the don't come point is not set. Come out roll.
             switch (roll) {
                 case 2:
                 case 3:

@@ -1,10 +1,11 @@
 import { Dispatch, SetStateAction } from 'react';
 import Accordion from 'react-bootstrap/Accordion';
 import MaxComeBetsInput from './MaxComeBetsInput';
-import NumericInput  from './NumericInput';
+import NumericInput from './NumericInput';
 import OddsBetInput from './OddsBetInput';
 import { OddsBetStrategy } from "../../game/OddsBetStrategy";
 import { Configuration } from '../../game/Configuration';
+import BooleanSwitchInput from './BooleanSwitchInput';
 
 
 export type StrategyConfigurationProps = {
@@ -88,6 +89,15 @@ const StrategyConfiguration = ({ eventKey, configuration, setConfiguration }: St
                             }}
                             dont={false}
                         />
+                        <BooleanSwitchInput
+                            id="comeBetOddsWorkingComeOutInput"
+                            label="Come Bet Odds Working During Come Out Roll"
+                            helpText={"This setting configures whether come odds bets are working during the come out roll. By default, come bet odds are assumed to be off during the come out roll unless the player tells the dealer otherwise."}
+                            value={configuration.comeBetOddsWorkingComeOut}
+                            onChange={(newValue: boolean) => {
+                                setConfiguration(configuration.setComeBetOddsWorkingComeOut(newValue));
+                            }}
+                        />
                     </Accordion.Body>
                 </Accordion.Item>
                 <Accordion.Item eventKey="dontPassBet">
@@ -158,6 +168,15 @@ const StrategyConfiguration = ({ eventKey, configuration, setConfiguration }: St
                                 setConfiguration(configuration.setDontComeBetOddsStrategy(newStrategy));
                             }}
                             dont
+                        />
+                        <BooleanSwitchInput
+                            id="dontComeBetOddsWorkingComeOutInput"
+                            label="Don't Come Bet Odds Working During Come Out Roll"
+                            helpText={"This setting configures whether don't come odds bets are working during the come out roll. By default, don't come bet odds are assumed to be off during the come out roll unless the player tells the dealer otherwise."}
+                            value={configuration.dontComeBetOddsWorkingComeOut}
+                            onChange={(newValue: boolean) => {
+                                setConfiguration(configuration.setDontComeBetOddsWorkingComeOut(newValue));
+                            }}
                         />
                     </Accordion.Body>
                 </Accordion.Item>

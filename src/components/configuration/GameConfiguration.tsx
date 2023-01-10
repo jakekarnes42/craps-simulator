@@ -22,6 +22,7 @@ const GameConfiguration = ({ eventKey, configuration, setConfiguration }: GameCo
                 <BooleanSwitchInput
                     id="avoidRoundingInput"
                     label="Increase Bet to Avoid Rounding"
+                    helpText={"This setting configures whether bets are increased to avoid rounding losses."}
                     value={configuration.avoidRounding}
                     onChange={(newValue: boolean) => {
                         setConfiguration(configuration.setAvoidRounding(newValue));

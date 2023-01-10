@@ -12,11 +12,13 @@ interface ConfigurationProps {
     comeBet: number | null;
     maxComeBets: number;
     comeBetOddsStrategy: OddsBetStrategy;
+    comeBetOddsWorkingComeOut: boolean;
     dontPassBet: number | null;
     dontPassBetOddsStrategy: OddsBetStrategy;
     dontComeBet: number | null;
     maxDontComeBets: number;
     dontComeBetOddsStrategy: OddsBetStrategy;
+    dontComeBetOddsWorkingComeOut: boolean;
     avoidRounding: boolean;
     rounding: RoundingType;
     simulationCount: number | null;
@@ -32,11 +34,13 @@ export class Configuration {
     readonly comeBet: number | null;
     readonly maxComeBets: number;
     readonly comeBetOddsStrategy: OddsBetStrategy;
+    readonly comeBetOddsWorkingComeOut: boolean;
     readonly dontPassBet: number | null;
     readonly dontPassBetOddsStrategy: OddsBetStrategy;
     readonly dontComeBet: number | null;
     readonly maxDontComeBets: number;
     readonly dontComeBetOddsStrategy: OddsBetStrategy;
+    readonly dontComeBetOddsWorkingComeOut: boolean;
     readonly avoidRounding: boolean;
     readonly rounding: RoundingType;
     readonly simulationCount: number | null;
@@ -52,33 +56,36 @@ export class Configuration {
             comeBet,
             maxComeBets,
             comeBetOddsStrategy,
+            comeBetOddsWorkingComeOut,
             dontPassBet,
             dontPassBetOddsStrategy,
             dontComeBet,
             maxDontComeBets,
             dontComeBetOddsStrategy,
+            dontComeBetOddsWorkingComeOut,
             avoidRounding,
             rounding,
             simulationCount
         }: ConfigurationProps) {
-        this.avoidRounding = avoidRounding;
-        this.rounding = rounding;
-
-        this.initialBankroll = initialBankroll ? round(initialBankroll, rounding) : initialBankroll;
-        this.bankrollMinimum = bankrollMinimum ? round(bankrollMinimum, rounding) : bankrollMinimum;
-        this.bankrollMaximum = bankrollMaximum ? round(bankrollMaximum, rounding) : bankrollMaximum;
-        this.maximumRolls = maximumRolls ? round(maximumRolls, RoundingType.DOLLAR) : maximumRolls;
-        this.passBet = passBet ? round(passBet, rounding) : passBet;
-        this.passBetOddsStrategy = passBetOddsStrategy;
-        this.comeBet = comeBet ? round(comeBet, rounding) : comeBet;
-        this.maxComeBets = maxComeBets ? round(maxComeBets, RoundingType.DOLLAR) : maxComeBets;
-        this.comeBetOddsStrategy = comeBetOddsStrategy;
-        this.dontPassBet = dontPassBet ? round(dontPassBet, rounding) : dontPassBet;
-        this.dontPassBetOddsStrategy = dontPassBetOddsStrategy;
-        this.dontComeBet = dontComeBet ? round(dontComeBet, rounding) : dontComeBet;
-        this.maxDontComeBets = maxDontComeBets ? round(maxDontComeBets, RoundingType.DOLLAR) : maxDontComeBets;
-        this.dontComeBetOddsStrategy = dontComeBetOddsStrategy;
-        this.simulationCount = simulationCount ? round(simulationCount, RoundingType.DOLLAR) : simulationCount;
+            this.initialBankroll = initialBankroll ? round(initialBankroll, rounding) : initialBankroll;
+            this.bankrollMinimum = bankrollMinimum ? round(bankrollMinimum, rounding) : bankrollMinimum;
+            this.bankrollMaximum = bankrollMaximum ? round(bankrollMaximum, rounding) : bankrollMaximum;
+            this.maximumRolls = maximumRolls ? round(maximumRolls, RoundingType.DOLLAR) : maximumRolls;
+            this.passBet = passBet ? round(passBet, rounding) : passBet;
+            this.passBetOddsStrategy = passBetOddsStrategy;
+            this.comeBet = comeBet ? round(comeBet, rounding) : comeBet;
+            this.maxComeBets = maxComeBets ? round(maxComeBets, RoundingType.DOLLAR) : maxComeBets;
+            this.comeBetOddsStrategy = comeBetOddsStrategy;
+            this.comeBetOddsWorkingComeOut = comeBetOddsWorkingComeOut;
+            this.dontPassBet = dontPassBet ? round(dontPassBet, rounding) : dontPassBet;
+            this.dontPassBetOddsStrategy = dontPassBetOddsStrategy;
+            this.dontComeBet = dontComeBet ? round(dontComeBet, rounding) : dontComeBet;
+            this.maxDontComeBets = maxDontComeBets ? round(maxDontComeBets, RoundingType.DOLLAR) : maxDontComeBets;
+            this.dontComeBetOddsStrategy = dontComeBetOddsStrategy;
+            this.dontComeBetOddsWorkingComeOut = dontComeBetOddsWorkingComeOut;
+            this.avoidRounding = avoidRounding;
+            this.rounding = rounding;
+            this.simulationCount = simulationCount ? round(simulationCount, RoundingType.DOLLAR) : simulationCount;
     }
 
     /* Provides the default configuration for the site */
@@ -94,11 +101,13 @@ export class Configuration {
                 comeBet: null,
                 maxComeBets: 3,
                 comeBetOddsStrategy: { type: OddsBetStrategyType.NONE, value: 1 },
+                comeBetOddsWorkingComeOut: false,
                 dontPassBet: null,
                 dontPassBetOddsStrategy: { type: OddsBetStrategyType.NONE, value: 1 },
-                dontComeBet: null,
+                dontComeBet: null,  
                 maxDontComeBets: 3,
                 dontComeBetOddsStrategy: { type: OddsBetStrategyType.NONE, value: 1 },
+                dontComeBetOddsWorkingComeOut: false,
                 avoidRounding: true,
                 rounding: RoundingType.DOLLAR,
                 simulationCount: 10_000
@@ -143,6 +152,10 @@ export class Configuration {
         return new Configuration(Object.assign(this, { comeBetOddsStrategy: value }));
     }
 
+    public setComeBetOddsWorkingComeOut(value: boolean): Configuration {
+        return new Configuration(Object.assign(this, { comeBetOddsWorkingComeOut: value }));
+    }
+
     public setDontPassBet(value: number | null): Configuration {
         return new Configuration(Object.assign(this, { dontPassBet: value }));
     }
@@ -161,6 +174,10 @@ export class Configuration {
 
     public setDontComeBetOddsStrategy(value: OddsBetStrategy): Configuration {
         return new Configuration(Object.assign(this, { dontComeBetOddsStrategy: value }));
+    }
+    
+    public setDontComeBetOddsWorkingComeOut(value: boolean): Configuration {
+        return new Configuration(Object.assign(this, { dontComeBetOddsWorkingComeOut: value }));
     }
 
     public setAvoidRounding(value: boolean): Configuration {

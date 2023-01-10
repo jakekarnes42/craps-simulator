@@ -4,11 +4,12 @@ import Form from 'react-bootstrap/Form';
 export type BooleanSwitchInputProps = {
     id: string,
     label: string,
+    helpText: string,
     value: boolean
     onChange: (newValue: boolean) => void
 };
 
-const BooleanSwitchInput = ({ id, label, value, onChange }: BooleanSwitchInputProps): JSX.Element => {
+const BooleanSwitchInput = ({ id, label, helpText, value, onChange }: BooleanSwitchInputProps): JSX.Element => {
 
     return (
         <>
@@ -23,7 +24,7 @@ const BooleanSwitchInput = ({ id, label, value, onChange }: BooleanSwitchInputPr
             </div>
             <div className='mb-0'>
                 <small className="form-text text-muted" >
-                    This setting configures whether bets are increased to avoid rounding losses.
+                    {helpText}
                 </small>
             </div>
         </>
