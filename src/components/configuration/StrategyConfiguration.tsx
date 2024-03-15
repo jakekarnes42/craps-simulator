@@ -1,11 +1,11 @@
 import { Dispatch, SetStateAction } from 'react';
 import Accordion from 'react-bootstrap/Accordion';
+import { Configuration } from '../../game/Configuration';
+import { OddsBetStrategy } from "../../game/OddsBetStrategy";
+import BooleanSwitchInput from './BooleanSwitchInput';
 import MaxComeBetsInput from './MaxComeBetsInput';
 import NumericInput from './NumericInput';
 import OddsBetInput from './OddsBetInput';
-import { OddsBetStrategy } from "../../game/OddsBetStrategy";
-import { Configuration } from '../../game/Configuration';
-import BooleanSwitchInput from './BooleanSwitchInput';
 
 
 export type StrategyConfigurationProps = {

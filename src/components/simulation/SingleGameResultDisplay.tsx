@@ -1,7 +1,7 @@
 
 import { RollResult } from '../../game/Session';
-import { SingleGameRollDisplay } from './SingleGameRollDisplay';
 import { rollsToReadableDuration, TableSpeed } from '../../util/Util';
+import { SingleGameRollDisplay } from './SingleGameRollDisplay';
 
 type SingleGameResultDisplayProps = {
   results: Array<RollResult>,

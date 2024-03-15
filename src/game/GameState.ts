@@ -1,6 +1,4 @@
 import { Configuration } from "./Configuration";
-import { OddsBetStrategy, OddsBetStrategyType } from "./OddsBetStrategy"
-import { RoundingType } from "./RoundingType"
 
 interface GameStateProps {
     configuration: Configuration;
@@ -60,7 +58,7 @@ export class GameState {
     }
 
     static init(configuration: Configuration) {
-        if (configuration.getInvalidFields().length != 0 || configuration.initialBankroll === null) {
+        if (configuration.getInvalidFields().length !== 0 || configuration.initialBankroll === null) {
             throw new Error(`Cannot start game from invalid configuration: ${JSON.stringify(configuration)}`);
 
         }

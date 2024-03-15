@@ -15,7 +15,7 @@ export const SimulationButton = ({ simulationState, setSimulationState }: Simula
             return (
                 <Button
                     variant="primary"
-                    onClick={()=> {setSimulationState(SimulationState.RUNNING)}}
+                    onClick={() => { setSimulationState(SimulationState.RUNNING) }}
                 >
                     Click to run
                 </Button>
@@ -25,7 +25,7 @@ export const SimulationButton = ({ simulationState, setSimulationState }: Simula
             return (
                 <Button
                     variant="danger"
-                    onClick={()=> {setSimulationState(SimulationState.COMPLETE)}}
+                    onClick={() => { setSimulationState(SimulationState.COMPLETE) }}
                 >
                     Cancel
                 </Button>
@@ -35,7 +35,7 @@ export const SimulationButton = ({ simulationState, setSimulationState }: Simula
             return (
                 <Button
                     variant="primary"
-                    onClick={()=> {setSimulationState(SimulationState.RUNNING)}}
+                    onClick={() => { setSimulationState(SimulationState.RUNNING) }}
                 >
                     Run again
                 </Button>

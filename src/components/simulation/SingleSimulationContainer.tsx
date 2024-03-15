@@ -1,12 +1,11 @@
 
 import { useEffect, useState } from 'react';
 import { Configuration } from '../../game/Configuration';
+import { GameState } from '../../game/GameState';
+import { RollResult, executeSingleRoll } from '../../game/Session';
 import { SimulationButton } from './SimulationButton';
 import { SimulationState } from './SimulationState';
-import SingleGameWorker from '../../worker/singleGame.worker';
-import { executeSingleRoll, RollResult } from '../../game/Session';
 import { SingleGameResultDisplay } from './SingleGameResultDisplay';
-import { GameState } from '../../game/GameState';
 
 type SingleSimulationContainerProps = {
   configuration: Configuration,
@@ -28,14 +27,14 @@ export const SingleSimulationContainer = ({ configuration }: SingleSimulationCon
       //Not using web worker
       let gameState = GameState.init(configuration);
       while (!gameState.isDone()) {
-          console.log("Executing 1 roll");
-          const output = executeSingleRoll(gameState);
-          console.log("Executed 1 roll. Sending result");
-          setResults(results => [...results, output]);
-          gameState = output.resultingState;
+        console.log("Executing 1 roll");
+        const output = executeSingleRoll(gameState);
+        console.log("Executed 1 roll. Sending result");
+        setResults(results => [...results, output]);
+        gameState = output.resultingState;
       }
       setSimulationState(SimulationState.COMPLETE);
-  }
+    }
   }, [configuration, simulationState]);
 
   return (

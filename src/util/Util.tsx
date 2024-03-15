@@ -84,6 +84,6 @@ function closestDisvisibleNumber(original: number, divisor: number) {
     } else {
         //Not already divisible, let's find the closet.
         const quotient = Math.floor(original / divisor);
-        return divisor * (quotient + 1);
+        return divisor * (quotient + 1); // Round up to nearest multiple
     }
 }

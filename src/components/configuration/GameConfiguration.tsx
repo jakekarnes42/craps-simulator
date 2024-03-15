@@ -1,11 +1,10 @@
 import { Dispatch, SetStateAction } from 'react';
 import Accordion from 'react-bootstrap/Accordion';
-import RoundingInput from './RoundingInput';
-import { RoundingType } from "../../game/RoundingType";
 import { Configuration } from '../../game/Configuration';
-import NumericInput from './NumericInput';
-import { Form } from 'react-bootstrap';
+import { RoundingType } from "../../game/RoundingType";
 import BooleanSwitchInput from './BooleanSwitchInput';
+import NumericInput from './NumericInput';
+import RoundingInput from './RoundingInput';
 
 export type GameConfigurationProps = {
     eventKey: string,

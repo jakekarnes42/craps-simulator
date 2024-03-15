@@ -1,8 +1,5 @@
-
-import { RollResult } from '../../game/Session';
-import { SingleGameRollDisplay } from './SingleGameRollDisplay';
-import { convertToTwoDecimalPlaceString, rollsToReadableDuration, TableSpeed } from '../../util/Util';
-import { LimitReached, GameState } from '../../game/GameState';
+import { GameState, LimitReached } from '../../game/GameState';
+import { TableSpeed, convertToTwoDecimalPlaceString, rollsToReadableDuration } from '../../util/Util';
 
 type BulkResultDisplayProps = {
   results: Array<GameState>,
@@ -25,7 +22,7 @@ export const BulkResultDisplay = ({ results }: BulkResultDisplayProps) => {
   return (
     <div>
       <h3>Number of Simulated Sessions: {totalCount}</h3>
-      <h3>Percentage of {LimitReached.BANKROLL_MAX}: {convertToPercentageString((results.filter(result => result.limitReached() === LimitReached.BANKROLL_MAX).length / totalCount)) }</h3>
+      <h3>Percentage of {LimitReached.BANKROLL_MAX}: {convertToPercentageString((results.filter(result => result.limitReached() === LimitReached.BANKROLL_MAX).length / totalCount))}</h3>
       <h3>Percentage of {LimitReached.BANKROLL_MIN}: {convertToPercentageString((results.filter(result => result.limitReached() === LimitReached.BANKROLL_MIN).length / totalCount))}</h3>
       <h3>Percentage of {LimitReached.BUSTED}: {convertToPercentageString((results.filter(result => result.limitReached() === LimitReached.BUSTED).length / totalCount))}</h3>
       <h3>Percentage of {LimitReached.MAX_ROLLS}: {convertToPercentageString((results.filter(result => result.limitReached() === LimitReached.MAX_ROLLS).length / totalCount))}</h3>

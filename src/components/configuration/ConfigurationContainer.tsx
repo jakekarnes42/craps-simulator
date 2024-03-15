@@ -1,4 +1,4 @@
-import  { Dispatch, SetStateAction } from 'react';
+import { Dispatch, SetStateAction } from 'react';
 import { Accordion } from 'react-bootstrap';
 import { Configuration } from '../../game/Configuration';
 import GameConfiguration from './GameConfiguration';

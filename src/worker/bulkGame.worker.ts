@@ -23,9 +23,9 @@ self.onmessage = async ($event: MessageEvent) => {
                 gameState = output.resultingState;
             }
             results.push(gameState);
-            
+
             //Send update
-            if((i+1) % 1000 === 0){
+            if ((i + 1) % 1000 === 0) {
                 self.postMessage("1000 complete");
             }
         }
