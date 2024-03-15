@@ -32,9 +32,9 @@ const OddsBetInput = ({ id, label, controllingBetValue, avoidRounding, rounding,
                 </small>);
                 break;
             case OddsBetStrategyType.SETAMOUNT:
-                var helpText: string|JSX.Element;
-                if(avoidRounding){
-                    helpText =  (
+                let setAmountHelpText: string | JSX.Element;
+                if (avoidRounding) {
+                    setAmountHelpText = (
                         <>
                             <p className='mb-0'>The odds bet may vary slightly to avoid rounding.  Based on the current {label.toLocaleLowerCase()} bet value of ${controllingBetValue}, the player will make the following {label.toLocaleLowerCase()} odds bets:</p>
                             <ul>
@@ -47,7 +47,7 @@ const OddsBetInput = ({ id, label, controllingBetValue, avoidRounding, rounding,
                 } else {
                     const roundedAmount = round(strategy.value, rounding);
                     const roundedAmountText = rounding === RoundingType.CENT ? convertToTwoDecimalPlaceString(roundedAmount) : roundedAmount;
-                    helpText =  `The player will bet the following amount for each ${label.toLocaleLowerCase()} odds bet: $${roundedAmountText}.`;
+                    setAmountHelpText = `The player will bet the following amount for each ${label.toLocaleLowerCase()} odds bet: $${roundedAmountText}.`;
                 }
 
                 additionalContextElement = (
@@ -55,7 +55,7 @@ const OddsBetInput = ({ id, label, controllingBetValue, avoidRounding, rounding,
                         controlId={`${id}-amount`}
                         label={`${label} Odds Bet Amount`}
                         value={strategy.value}
-                        helpText={helpText}
+                        helpText={setAmountHelpText}
                         isValid={strategy.value > 0}
                         invalidText='Must be a numeric value greater than 0.'
                         handleChange={(newValue: number | null) => {
@@ -69,11 +69,10 @@ const OddsBetInput = ({ id, label, controllingBetValue, avoidRounding, rounding,
                 );
                 break;
             case OddsBetStrategyType.MULTIPLIER:
-                    
                 const desiredBet = strategy.value * controllingBetValue;
-                var helpText: string|JSX.Element;
-                if(avoidRounding){
-                    helpText =  (
+                let multiplierHelpText: string | JSX.Element;
+                if (avoidRounding) {
+                    multiplierHelpText = (
                         <>
                             <p className='mb-0'>The odds bet may vary slightly to avoid rounding. Based on the current {label.toLocaleLowerCase()} bet value of ${controllingBetValue}, the player will make the following {label.toLocaleLowerCase()} odds bets:</p>
                             <ul>
@@ -86,15 +85,15 @@ const OddsBetInput = ({ id, label, controllingBetValue, avoidRounding, rounding,
                 } else {
                     const roundedAmount = round(desiredBet, rounding);
                     const roundedAmountText = rounding === RoundingType.CENT ? convertToTwoDecimalPlaceString(roundedAmount) : roundedAmount;
-                    helpText = `The player will multiply the current ${label.toLocaleLowerCase()} bet of $${controllingBetValue} by ${strategy.value} when placing ${label.toLocaleLowerCase()} odds bet. The maximum ${label.toLocaleLowerCase()} odds bet will be: $${roundedAmountText}`;
+                    multiplierHelpText = `The player will multiply the current ${label.toLocaleLowerCase()} bet of $${controllingBetValue} by ${strategy.value} when placing ${label.toLocaleLowerCase()} odds bet. The maximum ${label.toLocaleLowerCase()} odds bet will be: $${roundedAmountText}`;
                 }
-                        
+
                 additionalContextElement = (
                     <NumericInput
                         controlId={`${id}-multiplier`}
                         label={`${label} Odds Bet Multiplier`}
                         value={strategy.value}
-                        helpText={helpText}
+                        helpText={multiplierHelpText}
                         isValid={strategy.value > 0}
                         invalidText='Must be a numeric value greater than 0.'
                         handleChange={(newValue: number | null) => {

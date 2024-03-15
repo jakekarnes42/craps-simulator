@@ -1,7 +1,7 @@
 
 import { ReactNode } from 'react';
-import { BetOutcome, PlacedBet, ResolvedBet, RollResult } from '../../game/Session';
 import { BetCollection, GameState } from '../../game/GameState';
+import { BetOutcome, PlacedBet, ResolvedBet, RollResult } from '../../game/Session';
 
 type SingleGameRollDisplayProps = {
   result: RollResult,
@@ -9,8 +9,8 @@ type SingleGameRollDisplayProps = {
 
 function representNewBets(newBets: PlacedBet[], newBankroll: number): ReactNode {
   if (newBets.length > 0) {
-    const listItems = newBets.map((newBet) =>
-      <li className='mb-0' key={newBet.type}>New {newBet.type}: ${newBet.bet}</li>
+    const listItems = newBets.map((newBet, index) =>
+      <li className='mb-0' key={index}>New {newBet.type}: ${newBet.bet}</li>
     );
 
     return <div>
@@ -25,8 +25,8 @@ function representNewBets(newBets: PlacedBet[], newBankroll: number): ReactNode 
 
 function representResolvedBets(resolvedBets: ResolvedBet[]): ReactNode {
   if (resolvedBets.length > 0) {
-    const listItems = resolvedBets.map((resolvedBet) =>
-      <li key={resolvedBet.placedBet.type}>{resolvedBet.placedBet.type}: Initial Bet ${resolvedBet.placedBet.bet}. Result: {resolvedBet.outcome === BetOutcome.WIN ? <span>Win. Payout ${resolvedBet.payout}</span> : resolvedBet.outcome === BetOutcome.LOSS ? "Loss" : <span>Push. Returned ${resolvedBet.payout}</span>}.</li>
+    const listItems = resolvedBets.map((resolvedBet, index) =>
+      <li key={index}>{resolvedBet.placedBet.type}: Initial Bet ${resolvedBet.placedBet.bet}. Result: {resolvedBet.outcome === BetOutcome.WIN ? <span>Win. Payout ${resolvedBet.payout}</span> : resolvedBet.outcome === BetOutcome.LOSS ? "Loss" : <span>Push. Returned ${resolvedBet.payout}</span>}.</li>
     );
 
     return <div>

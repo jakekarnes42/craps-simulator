@@ -1,4 +1,4 @@
-import { round, calculateOddsBetAmountAvoidRounding } from "../util/Util";
+import { calculateOddsBetAmountAvoidRounding, round } from "../util/Util";
 import { GameState } from "./GameState";
 import { OddsBetStrategy, OddsBetStrategyType } from "./OddsBetStrategy";
 import { RoundingType } from "./RoundingType";
@@ -294,7 +294,9 @@ function placeBets(initialState: GameState): { placedBetState: GameState, newBet
 
 function calculateOddsBetAmount({ controllingBetValue, strategy, avoidRounding, rounding, dont, point }: { controllingBetValue: number; strategy: OddsBetStrategy; avoidRounding: boolean, rounding: RoundingType; dont: boolean; point: number }): number {
     switch (strategy.type) {
-        case OddsBetStrategyType.NONE: return 0;
+        case OddsBetStrategyType.NONE: {
+            return 0;
+        }
         case OddsBetStrategyType.SETAMOUNT: {
             if (avoidRounding) {
                 const plannedBet = strategy.value;
@@ -330,7 +332,10 @@ function calculateOddsBetAmount({ controllingBetValue, strategy, avoidRounding, 
                         throw new Error("Cannot calculate 3-4-5x odds without a point value");
                 }
             }
-        };
+        }
+        default: {
+            throw new Error("Unexpected strategy type: " + strategy.type);
+        }
     }
 }
 

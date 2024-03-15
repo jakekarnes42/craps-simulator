@@ -1,11 +1,11 @@
 
 import { useEffect, useState } from 'react';
 import { Configuration } from '../../game/Configuration';
-import { SimulationButton } from './SimulationButton';
-import { SimulationState } from './SimulationState';
+import { BetCollection, GameState } from '../../game/GameState';
 import BulkGameWorker from '../../worker/bulkGame.worker';
 import { BulkResultDisplay } from './BulkResultDisplay';
-import { BetCollection, GameState } from '../../game/GameState';
+import { SimulationButton } from './SimulationButton';
+import { SimulationState } from './SimulationState';
 
 type BulkSimulationContainerProps = {
   configuration: Configuration,
@@ -73,8 +73,8 @@ export const BulkSimulationContainer = ({ configuration }: BulkSimulationContain
     //If we've transitioned into a Completed state
     if (simulationState === SimulationState.COMPLETE) {
       console.log("Simulation cancelled. Terminating workers");
-      workers.forEach(worker => { worker.terminate() });
-      setWorkers(workers => []);
+      workers.forEach(worker => worker.terminate()); // Terminate all workers
+      setWorkers([]); // Clear worker list
     }
 
 
