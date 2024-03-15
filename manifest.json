@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "Craps Simulator",
+  "name": "Craps Simulator",
   "icons": [
     {
       "src": "favicon.ico",
