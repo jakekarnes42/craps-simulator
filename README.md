@@ -4,9 +4,12 @@ In-browser application for bulk simulation of simple craps strategies. Live at [
 
 ## Launch Locally
 
-### `npm start`
+```bash
+npm install
+npm start
+```
 
-Runs the app in the development mode.\
+Runs the app in the development mode.
 Open [http://localhost:3000/craps-simulator](http://localhost:3000/craps-simulator) to view it in the browser.
 
 The page will reload if you make edits.\
