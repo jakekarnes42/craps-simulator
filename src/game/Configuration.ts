@@ -211,7 +211,7 @@ export class Configuration {
     }
 
     public isSimulationCountValid(): boolean {
-        return this.initialBankroll != null && this.initialBankroll > 0;
+        return this.simulationCount != null && this.simulationCount > 0;
     }
 
     public getInvalidFields(): string[] {
