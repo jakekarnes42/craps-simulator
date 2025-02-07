@@ -24,15 +24,18 @@ export const SingleSimulationContainer = ({ configuration }: SingleSimulationCon
       //Clear past results
       setResults([]);
 
-      //Not using web worker
+      // Run the entire simulation in a tight loop, without using a web worker. 
       let gameState = GameState.init(configuration);
+      const newResults: RollResult[] = [];
+
       while (!gameState.isDone()) {
-        console.log("Executing 1 roll");
-        const output = executeSingleRoll(gameState);
-        console.log("Executed 1 roll. Sending result");
-        setResults(results => [...results, output]);
-        gameState = output.resultingState;
+        const rollResult = executeSingleRoll(gameState);
+        newResults.push(rollResult);
+        gameState = rollResult.resultingState;
       }
+
+      // Update React state once, at the very end
+      setResults(newResults);
       setSimulationState(SimulationState.COMPLETE);
     }
   }, [configuration, simulationState]);
