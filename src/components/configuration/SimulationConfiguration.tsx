@@ -6,17 +6,17 @@ import BooleanSwitchInput from './BooleanSwitchInput';
 import NumericInput from './NumericInput';
 import RoundingInput from './RoundingInput';
 
-export type GameConfigurationProps = {
+export type SimulationConfigurationProps = {
     eventKey: string,
     configuration: Configuration,
     setConfiguration: Dispatch<SetStateAction<Configuration>>
 };
 
-const GameConfiguration = ({ eventKey, configuration, setConfiguration }: GameConfigurationProps): JSX.Element => {
+const SimulationConfiguration = ({ eventKey, configuration, setConfiguration }: SimulationConfigurationProps): JSX.Element => {
 
     return (
         <Accordion.Item eventKey={eventKey}>
-            <Accordion.Header>Game Configuration</Accordion.Header>
+            <Accordion.Header>Simulation Configuration</Accordion.Header>
             <Accordion.Body>
                 <BooleanSwitchInput
                     id="avoidRoundingInput"
@@ -56,4 +56,4 @@ const GameConfiguration = ({ eventKey, configuration, setConfiguration }: GameCo
     );
 };
 
-export default GameConfiguration;
+export default SimulationConfiguration;

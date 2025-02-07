@@ -1,7 +1,7 @@
 import { Dispatch, SetStateAction } from 'react';
 import { Accordion } from 'react-bootstrap';
 import { Configuration } from '../../game/Configuration';
-import GameConfiguration from './GameConfiguration';
+import SimulationConfiguration from './SimulationConfiguration';
 import PlayerConfiguration from './PlayerConfiguration';
 import StrategyConfiguration from './StrategyConfiguration';
 
@@ -25,8 +25,8 @@ const ConfigurationContainer = ({ configuration, setConfiguration }: Configurati
         configuration={configuration}
         setConfiguration={setConfiguration}
       />
-      <GameConfiguration
-        eventKey='gameConfiguration'
+      <SimulationConfiguration
+        eventKey='simulationConfiguration'
         configuration={configuration}
         setConfiguration={setConfiguration}
       />
