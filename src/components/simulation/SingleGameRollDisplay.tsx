@@ -1,104 +1,186 @@
-
-import { ReactNode } from 'react';
+import React, { ReactNode } from 'react';
 import { BetCollection, GameState } from '../../game/GameState';
 import { BetOutcome, PlacedBet, ResolvedBet, RollResult } from '../../game/Session';
+import { Badge } from 'react-bootstrap';
 
 type SingleGameRollDisplayProps = {
   result: RollResult,
+};
+
+/**
+ * Helper to color-code the outcome. 
+ * You can adjust colors / text / badges as you wish.
+ */
+function renderOutcomeBadge(outcome: BetOutcome, payout: number): JSX.Element {
+  switch (outcome) {
+    case BetOutcome.WIN:
+      return <Badge bg="success">Win (+${payout})</Badge>;
+    case BetOutcome.LOSS:
+      return <Badge bg="danger">Loss</Badge>;
+    case BetOutcome.PUSH:
+      return <Badge bg="secondary">Push (Returned ${payout})</Badge>;
+  }
 }
 
 function representNewBets(newBets: PlacedBet[], newBankroll: number): ReactNode {
-  if (newBets.length > 0) {
-    const listItems = newBets.map((newBet, index) =>
-      <li className='mb-0' key={index}>New {newBet.type}: ${newBet.bet}</li>
-    );
+  if (newBets.length === 0) return <p className='mb-0'>No new bets placed.</p>;
 
-    return <div>
-      <p className='mb-0'>New Bets: </p>
-      <ul className='mb-0'>{listItems}</ul>
-      <p className='mb-0'>Bankroll after placing bets: ${newBankroll}</p>
-    </div>;
-  } else {
-    return <></>;
-  }
+  return (
+    <>
+      {newBets.map((newBet, index) => (
+        <p className='mb-0' key={index}>
+          <strong>New {newBet.type}:</strong> ${newBet.bet}
+        </p>
+      ))}
+      <p className='mb-0'>
+        <strong>Bankroll after placing bets:</strong> ${newBankroll}
+      </p>
+    </>
+  );
 }
 
 function representResolvedBets(resolvedBets: ResolvedBet[]): ReactNode {
-  if (resolvedBets.length > 0) {
-    const listItems = resolvedBets.map((resolvedBet, index) =>
-      <li key={index}>{resolvedBet.placedBet.type}: Initial Bet ${resolvedBet.placedBet.bet}. Result: {resolvedBet.outcome === BetOutcome.WIN ? <span>Win. Payout ${resolvedBet.payout}</span> : resolvedBet.outcome === BetOutcome.LOSS ? "Loss" : <span>Push. Returned ${resolvedBet.payout}</span>}.</li>
-    );
-
-    return <div>
-      <p className='mb-0'>Resolved Bets: </p>
-      <ul className='mb-0'>{listItems}</ul>
-    </div>;
-  } else {
-    return <></>;
+  if (resolvedBets.length === 0) {
+    return <p className='mb-0'>No bets resolved this roll.</p>;
   }
+
+  return (
+    <>
+      {resolvedBets.map((resolvedBet, index) => (
+        <div key={index} className="mb-1">
+          <strong>{resolvedBet.placedBet.type}</strong> &nbsp; 
+          (${resolvedBet.placedBet.bet}) &nbsp; 
+          {renderOutcomeBadge(resolvedBet.outcome, resolvedBet.payout)}
+        </div>
+      ))}
+    </>
+  );
 }
 
 function representBetCollection(currentBets: BetCollection): ReactNode {
+  const {
+    passLineBet,
+    dontPassBet,
+    comeBets,
+    dontComeBets
+  } = currentBets;
 
-  const passLineBetDisplay = currentBets.passLineBet ? <li>Pass Line Bet: ${currentBets.passLineBet.bet} {currentBets.passLineBet.odds ? <span> with odds: ${currentBets.passLineBet.odds}</span> : <></>}</li> : <></>;
-  const dontPassBetDisplay = currentBets.dontPassBet ? <li>Don't Pass Bet: ${currentBets.dontPassBet.bet} {currentBets.dontPassBet.odds ? <span> with odds: ${currentBets.dontPassBet.odds}</span> : <></>}</li> : <></>;
-  const comeBetsDisplay = currentBets.comeBets.length > 0 ? currentBets.comeBets.map(comeBet => <li>Come Bet: ${comeBet.bet}. Come Point: {comeBet.comePoint ? comeBet.comePoint : "Not Set"}. {comeBet.odds ? <span> With odds: ${comeBet.odds}</span> : <></>}</li>) : <></>;
-  const dontBetsDisplay = currentBets.dontComeBets.length > 0 ? currentBets.dontComeBets.map(dontComeBet => <li>Don't Come Bet: ${dontComeBet.bet}. Don't Come Point: {dontComeBet.comePoint ? dontComeBet.comePoint : "Not Set"}. {dontComeBet.odds ? <span> With odds: ${dontComeBet.odds}</span> : <></>}</li>) : <></>;
-  return (
-    <div>
-      <p className='mb-0'>All Current Bets: </p>
-      <ul className='mb-0'>
-        {passLineBetDisplay}
-        {dontPassBetDisplay}
-        {comeBetsDisplay}
-        {dontBetsDisplay}
-      </ul>
-    </div>);
+  const passLineDisplay = passLineBet ? (
+    <li>
+      <strong>Pass Line Bet:</strong> ${passLineBet.bet}
+      {passLineBet.odds && (
+        <span> &mdash; <em>Odds:</em> ${passLineBet.odds}</span>
+      )}
+    </li>
+  ) : null;
 
+  const dontPassDisplay = dontPassBet ? (
+    <li>
+      <strong>Don&apos;t Pass Bet:</strong> ${dontPassBet.bet}
+      {dontPassBet.odds && (
+        <span> &mdash; <em>Odds:</em> ${dontPassBet.odds}</span>
+      )}
+    </li>
+  ) : null;
+
+  const comeBetItems = comeBets.map((cb, i) => (
+    <li key={i}>
+      <strong>Come Bet:</strong> ${cb.bet}
+      {cb.comePoint && <span> &mdash; <em>Come Point:</em> {cb.comePoint}</span>}
+      {cb.odds && (
+        <span> &mdash; <em>Odds:</em> ${cb.odds}</span>
+      )}
+    </li>
+  ));
+
+  const dontComeBetItems = dontComeBets.map((dcb, i) => (
+    <li key={i}>
+      <strong>Don&apos;t Come Bet:</strong> ${dcb.bet}
+      {dcb.comePoint && <span> &mdash; <em>DC Point:</em> {dcb.comePoint}</span>}
+      {dcb.odds && (
+        <span> &mdash; <em>Odds:</em> ${dcb.odds}</span>
+      )}
+    </li>
+  ));
+
+  const hasBets = passLineBet || dontPassBet || comeBets.length || dontComeBets.length;
+
+  return hasBets ? (
+    <ul className='mb-0'>
+      {passLineDisplay}
+      {dontPassDisplay}
+      {comeBetItems}
+      {dontComeBetItems}
+    </ul>
+  ) : (
+    <p className='mb-0'>No active bets.</p>
+  );
+}
+
+function renderPoint(state: GameState): ReactNode {
+  if (state.pointIsOn && state.point) {
+    return (
+      <p className='mb-0'>
+        <strong>Point is on:</strong> {state.point}
+      </p>
+    );
+  }
+  return <p className='mb-0'><strong>Point is off.</strong></p>;
 }
 
 export const SingleGameRollDisplay = ({ result }: SingleGameRollDisplayProps) => {
+  const {
+    initialState,
+    newBets,
+    placedBetState,
+    roll,
+    resolvedBets,
+    resultingState,
+  } = result;
 
   return (
-    <div className="row border mb-2">
-      <h5 className='mt-1'>Roll: {result.initialState.rollNum}</h5>
-      <div className="col-sm border-top border-end">
-        <h6 className='mt-1'>Before the Roll: </h6>
-        <p className='mb-0'>Bankroll before bets: ${result.initialState.bankroll}</p>
-        {renderPoint(result.initialState)}
+    <div className="row border mb-3 p-3">
+      {/* Row Heading */}
+      <div className="col-12 mb-2">
+        <h5 className="m-0">
+          Roll #{initialState.rollNum} &nbsp; 
+          <small className="text-muted">Dice: {roll}</small>
+        </h5>
       </div>
-      <div className="col-sm border-top border-start border-end">
-        <h6 className='mt-1'>Placing Bets:</h6>
-        {representNewBets(result.newBets, result.placedBetState.bankroll)}
-        {representBetCollection(result.placedBetState.currentBets)}
+
+      {/* Column 1: Before the Roll */}
+      <div className="col-md-2 mb-2">
+        <h6 className="text-primary">Before the Roll</h6>
+        <p className="mb-1">
+          <strong>Bankroll:</strong> ${initialState.bankroll}
+        </p>
+        {renderPoint(initialState)}
       </div>
-      <div className="col-sm border-top border-start ">
-        <h6 className='mt-1'>The Roll: {result.roll}</h6>
-        {renderPoint(result.resultingState)}
-        {representResolvedBets(result.resolvedBets)}
-        <p className='mb-0'>Bankroll after placing bets: ${result.resultingState.bankroll}</p>
+
+      {/* Column 2: Placing Bets */}
+      <div className="col-md-3 mb-2">
+        <h6 className="text-primary">Placing Bets</h6>
+        {representNewBets(newBets, placedBetState.bankroll)}
+      </div>
+
+      {/* Column 3: All Current Bets */}
+      <div className="col-md-4 mb-2">
+        <h6 className="text-primary">All Current Bets</h6>
+        {representBetCollection(placedBetState.currentBets)}
+      </div>
+
+      {/* Column 4: Roll Results */}
+      <div className="col-md-3">
+        <h6 className="text-primary">Roll Results</h6>
+        <p className="mb-0">
+          <strong>Dice Total:</strong> {roll}
+        </p>
+        {renderPoint(resultingState)}
+        {representResolvedBets(resolvedBets)}
+        <p className="mb-0">
+          <strong>Bankroll after resolution:</strong> ${resultingState.bankroll}
+        </p>
       </div>
     </div>
   );
-
-
 };
-
-
-
-
-
-function renderPoint(state: GameState): ReactNode {
-  if (state.point) {
-    return (<div >
-      <p className='mb-0'>The Point is On.</p>
-      <p className='mb-0'>The Point is set to {state.point}.</p>
-    </div>);
-  } else {
-    return (<div>
-      <p className='mb-0'>The Point is Off.</p>
-    </div>);
-  }
-
-}
-
