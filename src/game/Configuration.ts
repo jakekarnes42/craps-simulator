@@ -19,6 +19,16 @@ interface ConfigurationProps {
     maxDontComeBets: number;
     dontComeBetOddsStrategy: OddsBetStrategy;
     dontComeBetOddsWorkingComeOut: boolean;
+    numberBet4: number | null;
+    numberBet5: number | null;
+    numberBet6: number | null;
+    numberBet8: number | null;
+    numberBet9: number | null;
+    numberBet10: number | null;
+    placeNumberBetsDuringComeOut: boolean;
+    leaveNumberBetsWorkingDuringComeOut: boolean;
+    omitNumberBetOnPoint: boolean;
+    leaveWinningNumberBetsWorking: boolean;
     avoidRounding: boolean;
     rounding: RoundingType;
     simulationCount: number | null;
@@ -41,6 +51,16 @@ export class Configuration {
     readonly maxDontComeBets: number;
     readonly dontComeBetOddsStrategy: OddsBetStrategy;
     readonly dontComeBetOddsWorkingComeOut: boolean;
+    readonly numberBet4: number | null;
+    readonly numberBet5: number | null;
+    readonly numberBet6: number | null;
+    readonly numberBet8: number | null;
+    readonly numberBet9: number | null;
+    readonly numberBet10: number | null;
+    readonly placeNumberBetsDuringComeOut: boolean;
+    readonly leaveNumberBetsWorkingDuringComeOut: boolean;
+    readonly omitNumberBetOnPoint: boolean;
+    readonly leaveWinningNumberBetsWorking: boolean;
     readonly avoidRounding: boolean;
     readonly rounding: RoundingType;
     readonly simulationCount: number | null;
@@ -63,6 +83,16 @@ export class Configuration {
             maxDontComeBets,
             dontComeBetOddsStrategy,
             dontComeBetOddsWorkingComeOut,
+            numberBet4,
+            numberBet5,
+            numberBet6,
+            numberBet8,
+            numberBet9,
+            numberBet10,
+            placeNumberBetsDuringComeOut,
+            leaveNumberBetsWorkingDuringComeOut,
+            omitNumberBetOnPoint,
+            leaveWinningNumberBetsWorking,
             avoidRounding,
             rounding,
             simulationCount
@@ -83,6 +113,16 @@ export class Configuration {
         this.maxDontComeBets = maxDontComeBets ? round(maxDontComeBets, RoundingType.DOLLAR) : maxDontComeBets;
         this.dontComeBetOddsStrategy = dontComeBetOddsStrategy;
         this.dontComeBetOddsWorkingComeOut = dontComeBetOddsWorkingComeOut;
+        this.numberBet4 = numberBet4 != null ? round(numberBet4, rounding) : null;
+        this.numberBet5 = numberBet5 != null ? round(numberBet5, rounding) : null;
+        this.numberBet6 = numberBet6 != null ? round(numberBet6, rounding) : null;
+        this.numberBet8 = numberBet8 != null ? round(numberBet8, rounding) : null;
+        this.numberBet9 = numberBet9 != null ? round(numberBet9, rounding) : null;
+        this.numberBet10 = numberBet10 != null ? round(numberBet10, rounding) : null;
+        this.placeNumberBetsDuringComeOut = placeNumberBetsDuringComeOut ?? false;
+        this.leaveNumberBetsWorkingDuringComeOut = leaveNumberBetsWorkingDuringComeOut ?? false;
+        this.omitNumberBetOnPoint = omitNumberBetOnPoint ?? true;
+        this.leaveWinningNumberBetsWorking = leaveWinningNumberBetsWorking ?? true;
         this.avoidRounding = avoidRounding;
         this.rounding = rounding;
         this.simulationCount = simulationCount ? round(simulationCount, RoundingType.DOLLAR) : simulationCount;
@@ -108,6 +148,16 @@ export class Configuration {
                 maxDontComeBets: 3,
                 dontComeBetOddsStrategy: { type: OddsBetStrategyType.NONE, value: 1 },
                 dontComeBetOddsWorkingComeOut: false,
+                numberBet4: null,
+                numberBet5: null,
+                numberBet6: null,
+                numberBet8: null,
+                numberBet9: null,
+                numberBet10: null,
+                placeNumberBetsDuringComeOut: false,
+                leaveNumberBetsWorkingDuringComeOut: false,
+                omitNumberBetOnPoint: true,
+                leaveWinningNumberBetsWorking: true,
                 avoidRounding: true,
                 rounding: RoundingType.DOLLAR,
                 simulationCount: 10_000
@@ -178,6 +228,46 @@ export class Configuration {
 
     public setDontComeBetOddsWorkingComeOut(value: boolean): Configuration {
         return new Configuration(Object.assign(this, { dontComeBetOddsWorkingComeOut: value }));
+    }
+
+    public setNumberBet4(value: number | null): Configuration {
+        return new Configuration(Object.assign({}, this, { numberBet4: value }));
+    }
+
+    public setNumberBet5(value: number | null): Configuration {
+        return new Configuration(Object.assign({}, this, { numberBet5: value }));
+    }
+
+    public setNumberBet6(value: number | null): Configuration {
+        return new Configuration(Object.assign({}, this, { numberBet6: value }));
+    }
+
+    public setNumberBet8(value: number | null): Configuration {
+        return new Configuration(Object.assign({}, this, { numberBet8: value }));
+    }
+
+    public setNumberBet9(value: number | null): Configuration {
+        return new Configuration(Object.assign({}, this, { numberBet9: value }));
+    }
+
+    public setNumberBet10(value: number | null): Configuration {
+        return new Configuration(Object.assign({}, this, { numberBet10: value }));
+    }
+
+    public setPlaceNumberBetsDuringComeOut(value: boolean): Configuration {
+        return new Configuration({ ...this, placeNumberBetsDuringComeOut: value });
+    }
+
+    public setLeaveNumberBetsWorkingDuringComeOut(value: boolean): Configuration {
+        return new Configuration({ ...this, leaveNumberBetsWorkingDuringComeOut: value });
+    }
+
+    public setOmitNumberBetOnPoint(value: boolean): Configuration {
+        return new Configuration({ ...this, omitNumberBetOnPoint: value });
+    }
+    
+    public setLeaveWinningNumberBetsWorking(value: boolean): Configuration {
+        return new Configuration({ ...this, leaveWinningNumberBetsWorking: value });
     }
 
     public setAvoidRounding(value: boolean): Configuration {

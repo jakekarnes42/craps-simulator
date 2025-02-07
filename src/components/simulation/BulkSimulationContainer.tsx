@@ -44,7 +44,7 @@ export const BulkSimulationContainer = ({ configuration }: BulkSimulationContain
             console.log("New results from worker. Updating list");
 
             const workerOutput = $event.data;
-            const workerResults = workerOutput.map((workerResult: { rollNum: number; bankroll: number; point: number; pointIsOn: boolean; currentBets: BetCollection; }) => {
+            const workerResults = workerOutput.map((workerResult: { rollNum: number; bankroll: number; point: number; pointIsOn: boolean; currentBets: BetCollection; cashedOutNumbers: (4 | 5 | 6 | 8 | 9 | 10)[]}) => {
               return new GameState(
                 {
                   configuration,
@@ -52,7 +52,8 @@ export const BulkSimulationContainer = ({ configuration }: BulkSimulationContain
                   bankroll: workerResult.bankroll,
                   point: workerResult.point,
                   pointIsOn: workerResult.pointIsOn,
-                  currentBets: workerResult.currentBets
+                  currentBets: workerResult.currentBets,
+                  cashedOutNumbers: workerResult.cashedOutNumbers
                 }
               )
             });

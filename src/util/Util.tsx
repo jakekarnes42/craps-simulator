@@ -47,11 +47,11 @@ export function calculateOddsBetAmountAvoidRounding(plannedBet: number, dont: bo
             case 5:
             case 9:
                 //The payout value will be calculated as 1.5*bet, so we need a number divisble by 2
-                return closestDisvisibleNumber(plannedBet, 2);
+                return ceilToNearestMultiple(plannedBet, 2);
             case 6:
             case 8:
                 //The payout value will be calculated as 1.2*bet, so we need a number divisble by 5
-                return closestDisvisibleNumber(plannedBet, 5);
+                return ceilToNearestMultiple(plannedBet, 5);
             default:
                 throw new Error("Unexpected point value when calculating odds bet to avoid rounding: " + point);
         }
@@ -61,22 +61,58 @@ export function calculateOddsBetAmountAvoidRounding(plannedBet: number, dont: bo
             case 4:
             case 10:
                 //The payout value will be calculated as bet / 2, so we need a number divisble by 2
-                return closestDisvisibleNumber(plannedBet, 2);
+                return ceilToNearestMultiple(plannedBet, 2);
             case 5:
             case 9:
                 //The payout value will be calculated as bet * 2/3, so we need a number divisble by 3
-                return closestDisvisibleNumber(plannedBet, 3);
+                return ceilToNearestMultiple(plannedBet, 3);
             case 6:
             case 8:
                 //The payout value will be calculated as bet*5/6, so we need a number divisble by 6
-                return closestDisvisibleNumber(plannedBet, 6);
+                return ceilToNearestMultiple(plannedBet, 6);
             default:
                 throw new Error("Unexpected point value when calculating odds bet to avoid rounding: " + point);
         }
     }
 }
 
-function closestDisvisibleNumber(original: number, divisor: number) {
+export function calculateNumberBetAvoidRounding(
+    plannedBet: number,
+    number: 4 | 5 | 6 | 8 | 9 | 10
+): number {
+    // If the user’s “planned bet” is zero or negative, or no bet is intended, skip:
+    if (plannedBet <= 0) {
+        return plannedBet;
+    }
+
+    // For 4 & 10, if bet >= 20 treat as a "Buy" bet (2:1 minus 5% vig). 
+    // We want 0.05 * bet to be an integer → bet must be multiple of 20 for no rounding.
+    // If bet < 20 treat as a "Place" bet paying 9:5, so bet must be multiple of 5 to avoid fractional payoff.
+    if (number === 4 || number === 10) {
+        if (plannedBet >= 20) {
+            // “Buy Bet” → must be multiple of 20 to ensure the vig is an integer
+            return ceilToNearestMultiple(plannedBet, 20);
+        } else {
+            // “Place Bet” → 9/5 payoff → must be multiple of 5
+            return ceilToNearestMultiple(plannedBet, 5);
+        }
+    }
+
+    // For 5 & 9: place pays 7:5 → to avoid fractional payoff, bet must be multiple of 5
+    if (number === 5 || number === 9) {
+        return ceilToNearestMultiple(plannedBet, 5);
+    }
+
+    // For 6 & 8: place pays 7:6 → to avoid fractional payoff, bet must be multiple of 6
+    if (number === 6 || number === 8) {
+        return ceilToNearestMultiple(plannedBet, 6);
+    }
+
+    // Fallback
+    return plannedBet;
+}
+
+function ceilToNearestMultiple(original: number, divisor: number) {
     //Check if it's already divisble
     if (original % divisor === 0) {
         //This is already divisible. Just use it

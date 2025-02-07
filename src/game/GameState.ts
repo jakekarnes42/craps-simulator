@@ -7,6 +7,7 @@ interface GameStateProps {
     point: number;
     pointIsOn: boolean;
     currentBets: BetCollection;
+    cashedOutNumbers: Array<4 | 5 | 6 | 8 | 9 | 10>;
 }
 
 export interface Bet {
@@ -18,11 +19,17 @@ export interface ComeBet extends Bet {
     comePoint: number | null
 }
 
+export interface NumberBet {
+    number: 4 | 5 | 6 | 8 | 9 | 10;
+    wager: number;
+}
+
 export type BetCollection = {
     passLineBet: Bet | null;
     dontPassBet: Bet | null;
     comeBets: Array<ComeBet>;
     dontComeBets: Array<ComeBet>;
+    numberBets: Array<NumberBet>;
 }
 
 export enum LimitReached {
@@ -39,6 +46,7 @@ export class GameState {
     readonly point: number;
     readonly pointIsOn: boolean;
     readonly currentBets: BetCollection;
+    readonly cashedOutNumbers: Array<4 | 5 | 6 | 8 | 9 | 10>;
 
     constructor(
         {
@@ -47,7 +55,8 @@ export class GameState {
             bankroll,
             point,
             pointIsOn,
-            currentBets
+            currentBets,
+            cashedOutNumbers,
         }: GameStateProps) {
         this.configuration = configuration;
         this.rollNum = rollNum;
@@ -55,6 +64,7 @@ export class GameState {
         this.point = point;
         this.pointIsOn = pointIsOn;
         this.currentBets = currentBets;
+        this.cashedOutNumbers = cashedOutNumbers;
     }
 
     static init(configuration: Configuration) {
@@ -70,7 +80,8 @@ export class GameState {
                 bankroll: configuration.initialBankroll,
                 point: 0,
                 pointIsOn: false,
-                currentBets: { passLineBet: null, dontPassBet: null, comeBets: [], dontComeBets: [] }
+                currentBets: { passLineBet: null, dontPassBet: null, comeBets: [], dontComeBets: [], numberBets: [] },
+                cashedOutNumbers: []
             });
     }
 
@@ -109,29 +120,59 @@ export class GameState {
             return LimitReached.BUSTED;
         }
 
+        // 5. Enough to be > minimum but not enough to place any bet
+        if (this.configuration.bankrollMinimum != null && this.configuration.bankrollMinimum > 0) {
+            const difference = this.bankroll - this.configuration.bankrollMinimum;
+            if (difference > 0 && difference < this.minBetAmount()) {
+                // We can't place a bet without going below the minimum → effectively “walk away.”
+                return LimitReached.BANKROLL_MIN;
+            }
+        }
+
+
         //No limit reached, play on!
         return null;
     }
 
-    hasCurrentBet() {
-        //TODO add more bets
-        return this.currentBets.passLineBet !== null || this.currentBets.dontPassBet !== null || this.currentBets.comeBets.length > 0 || this.currentBets.dontComeBets.length > 0;
+    hasCurrentBet(): boolean {
+        const { passLineBet, dontPassBet, comeBets, dontComeBets, numberBets } = this.currentBets;
+        if (passLineBet || dontPassBet) return true;
+        if (comeBets.length > 0 || dontComeBets.length > 0) return true;
+        if (numberBets.length > 0) return true; // <--- include number bets
+        return false;
     }
 
-    minBetAmount() {
-        //TODO add more bets
-        const passBetAmount = this.configuration.passBet ? this.configuration.passBet : 0;
-        const dontPassBetAmount = this.configuration.dontPassBet ? this.configuration.dontPassBet : 0;
-        const comeBetAmount = this.configuration.comeBet ? this.configuration.comeBet : 0;
-        const dontComeBetAmount = this.configuration.dontComeBet ? this.configuration.dontComeBet : 0;
+    minBetAmount(): number {
+        const cfg = this.configuration;
 
-        const validBets = [passBetAmount, dontPassBetAmount, comeBetAmount, dontComeBetAmount].filter(bet => bet !== 0);
+        // We only look at configured bets that are > 0
+        const possibleBets: number[] = [];
 
-        if (validBets.length === 0) {
-            throw new Error("Unexpected configuration. Some bet must be set.");
+        if (cfg.passBet && cfg.passBet > 0) possibleBets.push(cfg.passBet);
+        if (cfg.dontPassBet && cfg.dontPassBet > 0) possibleBets.push(cfg.dontPassBet);
+        if (cfg.comeBet && cfg.comeBet > 0) possibleBets.push(cfg.comeBet);
+        if (cfg.dontComeBet && cfg.dontComeBet > 0) possibleBets.push(cfg.dontComeBet);
+
+        // Number bets. We should consider the smallest among 4,5,6,8,9,10 if set
+        const nb4 = cfg.numberBet4 ?? 0;
+        const nb5 = cfg.numberBet5 ?? 0;
+        const nb6 = cfg.numberBet6 ?? 0;
+        const nb8 = cfg.numberBet8 ?? 0;
+        const nb9 = cfg.numberBet9 ?? 0;
+        const nb10 = cfg.numberBet10 ?? 0;
+
+        [nb4, nb5, nb6, nb8, nb9, nb10].forEach((x) => {
+            if (x > 0) possibleBets.push(x);
+        });
+
+        if (possibleBets.length === 0) {
+            // If truly nothing is > 0, then there's no minimal bet. But
+            // realistically you'd never get here because your config was invalid
+            // if *all* bets were 0 or null. We might just return 0 or throw:
+            throw new Error("Unexpected configuration: all bets are zero/null. At least one bet is required.");
         }
 
-        return Math.min(...validBets);
+        return Math.min(...possibleBets);
     }
 
 

@@ -14,7 +14,7 @@ type ConfigurationContainerProps = {
 const ConfigurationContainer = ({ configuration, setConfiguration }: ConfigurationContainerProps) => {
 
   return (
-    <Accordion defaultActiveKey={['playerConfiguration', 'strategyConfiguration', 'passBet']} alwaysOpen className="mb-3">
+    <Accordion defaultActiveKey={['playerConfiguration', 'strategyConfiguration', 'passBet', 'simulationConfiguration']} alwaysOpen className="mb-3">
       <PlayerConfiguration
         eventKey="playerConfiguration"
         configuration={configuration}

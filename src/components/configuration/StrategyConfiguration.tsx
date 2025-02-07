@@ -6,6 +6,7 @@ import BooleanSwitchInput from './BooleanSwitchInput';
 import MaxComeBetsInput from './MaxComeBetsInput';
 import NumericInput from './NumericInput';
 import OddsBetInput from './OddsBetInput';
+import { NumberBetsConfiguration } from './NumberBetsConfiguration';
 
 
 export type StrategyConfigurationProps = {
@@ -178,8 +179,14 @@ const StrategyConfiguration = ({ eventKey, configuration, setConfiguration }: St
                                 setConfiguration(configuration.setDontComeBetOddsWorkingComeOut(newValue));
                             }}
                         />
+
                     </Accordion.Body>
                 </Accordion.Item>
+                <NumberBetsConfiguration
+                    eventKey="numberBets"
+                    configuration={configuration}
+                    setConfiguration={setConfiguration}
+                />
             </Accordion.Body>
         </Accordion.Item>
     );
