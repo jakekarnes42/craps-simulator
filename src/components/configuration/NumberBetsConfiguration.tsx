@@ -22,17 +22,17 @@ export const NumberBetsConfiguration = ({
 
   function getNumberBetHelpText(num: 4 | 5 | 6 | 8 | 9 | 10, userValue: number | null): JSX.Element | string {
     if (!userValue || userValue <= 0) {
-      return `Enter a wager amount for number ${num}, or leave blank to disable.`;
+      return `Enter a bet amount for number ${num}, or leave blank to disable.`;
     }
     if (!configuration.avoidRounding) {
       // Normal text
-      return `Enter the wager amount for number ${num}. Leave blank to skip betting on ${num}.`;
+      return `Enter the bet amount for number ${num}. Leave blank to skip betting on ${num}.`;
     } else {
       // “Avoid rounding” is on → show the "adjusted" bet:
       const actualBet = calculateNumberBetAvoidRounding(userValue, num);
       return (
         <>
-          <p className='mb-1'>Enter the wager amount for number {num}. (Avoid Rounding is enabled.)</p>
+          <p className='mb-1'>Enter the bet amount for number {num}. (Avoid Rounding is enabled.)</p>
           {
             actualBet === userValue
               ? <small>No adjustment needed. The bet remains ${userValue}.</small>
@@ -48,13 +48,13 @@ export const NumberBetsConfiguration = ({
       <Accordion.Header>Number Bets</Accordion.Header>
       <Accordion.Body>
         <p>
-          Configure your wagers for numbers 4, 5, 6, 8, 9, and 10 below.
-          Enter a positive wager amount to bet on that number, or leave blank to disable it.
+          Configure your bets for numbers 4, 5, 6, 8, 9, and 10 below.
+          Enter a positive bet amount to bet on that number, or leave blank to disable it.
         </p>
 
         <NumericInput
           controlId="numberBet4"
-          label="Number 4 Wager"
+          label="Number 4 Bet"
           value={configuration.numberBet4}
           helpText={getNumberBetHelpText(4, configuration.numberBet4)}
           isValid={true}
@@ -68,7 +68,7 @@ export const NumberBetsConfiguration = ({
         />
         <NumericInput
           controlId="numberBet5"
-          label="Number 5 Wager"
+          label="Number 5 Bet"
           value={configuration.numberBet5}
           helpText={getNumberBetHelpText(5, configuration.numberBet5)}
           isValid={true}
@@ -82,7 +82,7 @@ export const NumberBetsConfiguration = ({
         />
         <NumericInput
           controlId="numberBet6"
-          label="Number 6 Wager"
+          label="Number 6 Bet"
           value={configuration.numberBet6}
           helpText={getNumberBetHelpText(6, configuration.numberBet6)}
           isValid={true}
@@ -96,7 +96,7 @@ export const NumberBetsConfiguration = ({
         />
         <NumericInput
           controlId="numberBet8"
-          label="Number 8 Wager"
+          label="Number 8 Bet"
           value={configuration.numberBet8}
           helpText={getNumberBetHelpText(8, configuration.numberBet8)}
           isValid={true}
@@ -110,7 +110,7 @@ export const NumberBetsConfiguration = ({
         />
         <NumericInput
           controlId="numberBet9"
-          label="Number 9 Wager"
+          label="Number 9 Bet"
           value={configuration.numberBet9}
           helpText={getNumberBetHelpText(9, configuration.numberBet9)}
           isValid={true}
@@ -124,7 +124,7 @@ export const NumberBetsConfiguration = ({
         />
         <NumericInput
           controlId="numberBet10"
-          label="Number 10 Wager"
+          label="Number 10 Bet"
           value={configuration.numberBet10}
           helpText={getNumberBetHelpText(10, configuration.numberBet10)}
           isValid={true}
@@ -162,7 +162,7 @@ export const NumberBetsConfiguration = ({
         <BooleanSwitchInput
           id="omitNumberBetOnPoint"
           label="Omit Number Bet on the Point Number"
-          helpText="If enabled, a wager will not be placed on a number if it matches the current point."
+          helpText="If enabled, a bet will not be placed on a number if it matches the current point."
           value={configuration.omitNumberBetOnPoint}
           onChange={(newValue: boolean) => {
             setConfiguration(configuration.setOmitNumberBetOnPoint(newValue));

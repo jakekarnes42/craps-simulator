@@ -419,7 +419,7 @@ function placeNewNumberBetsForCycle(
         }
         if (canPlaceBet(bankroll, amountWithRounding, cfg.bankrollMinimum)) {
             bankroll -= amountWithRounding;
-            currentBets.numberBets.push({ number, wager: amountWithRounding, winCount: 0 });
+            currentBets.numberBets.push({ number, bet: amountWithRounding, winCount: 0 });
             newBets.push({ type: BetType.NUMBER_BET, bet: amountWithRounding, number });
         }
     }
@@ -893,7 +893,7 @@ function resolveNumberBets(
     if (roll === 7) {
         for (const nb of currentBets.numberBets) {
             resolvedBets.push({
-                placedBet: { type: BetType.NUMBER_BET, bet: nb.wager, number: nb.number },
+                placedBet: { type: BetType.NUMBER_BET, bet: nb.bet, number: nb.number },
                 outcome: BetOutcome.LOSS,
                 payout: 0
             });
@@ -907,11 +907,11 @@ function resolveNumberBets(
         if (roll === nb.number) {
             // The bet won:
             // 1) calculate payoff based on standard place/buy rules
-            const payoff = calculateNumberBetPayoff(nb.wager, nb.number, cfg.rounding);
+            const payoff = calculateNumberBetPayoff(nb.bet, nb.number, cfg.rounding);
 
             // 2) apply press strategy to see how much goes back onto the bet
             const { updatedBetSize, netToBankroll } = applyPressStrategy(
-                nb.wager,
+                nb.bet,
                 payoff,
                 nb.number,
                 cfg.pressStrategy
@@ -930,7 +930,7 @@ function resolveNumberBets(
                 bankroll += updatedBetSize;
 
                 resolvedBets.push({
-                    placedBet: { type: BetType.NUMBER_BET, bet: nb.wager, number: nb.number },
+                    placedBet: { type: BetType.NUMBER_BET, bet: nb.bet, number: nb.number },
                     outcome: BetOutcome.WIN,
                     payout: payoff,
                 });
@@ -938,10 +938,10 @@ function resolveNumberBets(
                 cashedOut.push(nb.number);
             } else {
                 // Remain on the table pressed up
-                nb.wager = updatedBetSize;
+                nb.bet = updatedBetSize;
 
                 resolvedBets.push({
-                    placedBet: { type: BetType.NUMBER_BET, bet: nb.wager, number: nb.number },
+                    placedBet: { type: BetType.NUMBER_BET, bet: nb.bet, number: nb.number },
                     outcome: BetOutcome.WIN,
                     payout: payoff,
                 });

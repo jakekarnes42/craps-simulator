@@ -75,11 +75,11 @@ const representNewBets = (newBets: PlacedBet[], newBankroll: number): ReactNode 
 /**
  * Calculates the press details for a winning NUMBER_BET.
  *
- * This helper computes, based on the original wager, the win (payout),
+ * This helper computes, based on the original bet, the win (payout),
  * the bet number, and the chosen press strategy, how much of the win is
  * reinvested into the bet (pressIncrease) and how much is returned to the bankroll.
  *
- * @param originalBet - The initial wager for the bet.
+ * @param originalBet - The initial bet for the bet.
  * @param payoff - The win payout (amount won) for the bet.
  * @param betNumber - The number the bet is placed on (4,5,6,8,9,10).
  * @param pressStrategy - The chosen press strategy.
@@ -211,7 +211,7 @@ export const SingleGameRollDisplay = ({ result }: SingleGameRollDisplayProps) =>
         : ` (Wins: ${nb.winCount})`;
       return (
         <li key={i}>
-          <strong>Number Bet ({nb.number}){!numberBetsActive ? ' (Off)' : ''}:</strong> ${nb.wager}{pressInfo}
+          <strong>Number Bet ({nb.number}){!numberBetsActive ? ' (Off)' : ''}:</strong> ${nb.bet}{pressInfo}
         </li>
       );
     });
