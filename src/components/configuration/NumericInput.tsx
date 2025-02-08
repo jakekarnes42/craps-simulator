@@ -9,11 +9,12 @@ export type NumericInputProps = {
     helpText: string | JSX.Element,
     isValid: boolean,
     invalidText: string,
-    handleChange: (val: number | null) => void
+    handleChange: (val: number | null) => void,
+    disabled?: boolean,
     style?: React.CSSProperties
 };
 
-const NumericInput = ({ controlId, label, placeholder, value, helpText, isValid, invalidText, handleChange, style }: NumericInputProps): JSX.Element => (
+const NumericInput = ({ controlId, label, placeholder, value, helpText, isValid, invalidText, handleChange, disabled, style }: NumericInputProps): JSX.Element => (
     <Form.Group className="mb-3" controlId={controlId} style={style} >
         <Form.Label>{label}</Form.Label>
         <Form.Control
@@ -21,6 +22,7 @@ const NumericInput = ({ controlId, label, placeholder, value, helpText, isValid,
             placeholder={placeholder}
             value={value == null ? '' : value}
             isInvalid={!isValid}
+            disabled={disabled}
             onChange={(e) => {
                 var returnValue: number | null;
                 if (e.currentTarget.value === "") {

@@ -1,12 +1,11 @@
 import { Dispatch, SetStateAction } from 'react';
 import Accordion from 'react-bootstrap/Accordion';
 import { Configuration } from '../../game/Configuration';
+import { PressStrategy } from '../../game/PressStrategy';
+import { calculateNumberBetAvoidRounding } from '../../util/Util';
 import BooleanSwitchInput from './BooleanSwitchInput';
 import NumericInput from './NumericInput';
-import { calculateNumberBetAvoidRounding } from '../../util/Util';
-import { ButtonGroup, Form } from 'react-bootstrap';
 import PressStrategyInput from './PressStrategyInput';
-import { PressStrategy } from '../../game/PressStrategy';
 
 type NumberBetsConfigurationProps = {
   eventKey: string;
@@ -42,6 +41,15 @@ export const NumberBetsConfiguration = ({
       );
     }
   }
+
+  // Check if any number bets have been configured. This tells us to enable their additional configuration options
+  const isNumberBetsActive =
+    Boolean(configuration.numberBet4 ||
+      configuration.numberBet5 ||
+      configuration.numberBet6 ||
+      configuration.numberBet8 ||
+      configuration.numberBet9 ||
+      configuration.numberBet10);
 
   return (
     <Accordion.Item eventKey={eventKey}>
@@ -147,6 +155,7 @@ export const NumberBetsConfiguration = ({
           onChange={(newValue: boolean) => {
             setConfiguration(configuration.setPlaceNumberBetsDuringComeOut(newValue));
           }}
+          disabled={!isNumberBetsActive}
         />
 
         <BooleanSwitchInput
@@ -157,6 +166,7 @@ export const NumberBetsConfiguration = ({
           onChange={(newValue: boolean) => {
             setConfiguration(configuration.setLeaveNumberBetsWorkingDuringComeOut(newValue));
           }}
+          disabled={!isNumberBetsActive}
         />
 
         <BooleanSwitchInput
@@ -167,6 +177,17 @@ export const NumberBetsConfiguration = ({
           onChange={(newValue: boolean) => {
             setConfiguration(configuration.setOmitNumberBetOnPoint(newValue));
           }}
+          disabled={!isNumberBetsActive}
+        />
+
+        <PressStrategyInput
+          id="pressStrategy"
+          label="Press Strategy"
+          value={configuration.pressStrategy}
+          onChange={(newValue: PressStrategy) => {
+            setConfiguration(configuration.setPressStrategy(newValue));
+          }}
+          disabled={!isNumberBetsActive}
         />
 
         <NumericInput
@@ -180,15 +201,7 @@ export const NumberBetsConfiguration = ({
           handleChange={(newValue) => {
             setConfiguration(configuration.setPressLimit(newValue));
           }}
-        />
-
-        <PressStrategyInput
-          id="pressStrategy"
-          label="Press Strategy"
-          value={configuration.pressStrategy}
-          onChange={(newValue: PressStrategy) => {
-            setConfiguration(configuration.setPressStrategy(newValue));
-          }}
+          disabled={!isNumberBetsActive}
         />
       </Accordion.Body>
     </Accordion.Item>

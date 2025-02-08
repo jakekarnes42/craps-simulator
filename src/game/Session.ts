@@ -1037,39 +1037,39 @@ function cloneBetCollection(bets: BetCollection): BetCollection {
 /**
  * Calculates the payoff for a bet on 4,5,6,8,9,10 using standard Vegas approach:
  * - For 4 or 10:
- *   - If wager >= $20, treat it like a Buy bet => 2:1 minus 5% vig on the bet if you win
- *   - If wager < $20, treat it like a Place bet => 9:5
+ *   - If bet >= $20, treat it like a Buy bet => 2:1 minus 5% vig on the bet if you win
+ *   - If bet < $20, treat it like a Place bet => 9:5
  * - For 5 or 9: place pays 7:5
  * - For 6 or 8: place pays 7:6
  *
  * The vig is collected only if the bet wins. 
  */
 function calculateNumberBetPayoff(
-    wager: number,
+    bet: number,
     number: number,
     rounding: RoundingType
 ): number {
     switch (number) {
         case 4:
         case 10:
-            if (wager >= 20) {
+            if (bet >= 20) {
                 //Buy bet -> 2:1 minus 5% vig on the bet
-                const rawWin = wager * 2;
+                const rawWin = bet * 2;
                 // Usually at least $1 in vig, but it depends. We'll do a standard round approach
-                const vig = round(0.05 * wager, rounding);
+                const vig = round(0.05 * bet, rounding);
                 return rawWin - vig;
             } else {
                 //Place bet -> 9:5
-                return round((wager * 9) / 5, rounding);
+                return round((bet * 9) / 5, rounding);
             }
         case 5:
         case 9:
             //Place bet -> 7:5
-            return round((wager * 7) / 5, rounding);
+            return round((bet * 7) / 5, rounding);
         case 6:
         case 8:
             //Place bet -> 7:6
-            return round((wager * 7) / 6, rounding);
+            return round((bet * 7) / 6, rounding);
         default:
             return 0;
     }

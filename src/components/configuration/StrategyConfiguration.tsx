@@ -98,6 +98,7 @@ const StrategyConfiguration = ({ eventKey, configuration, setConfiguration }: St
                             onChange={(newValue: boolean) => {
                                 setConfiguration(configuration.setComeBetOddsWorkingComeOut(newValue));
                             }}
+                            disabled={!configuration.comeBet}
                         />
                     </Accordion.Body>
                 </Accordion.Item>
@@ -178,6 +179,7 @@ const StrategyConfiguration = ({ eventKey, configuration, setConfiguration }: St
                             onChange={(newValue: boolean) => {
                                 setConfiguration(configuration.setDontComeBetOddsWorkingComeOut(newValue));
                             }}
+                            disabled={!configuration.dontComeBet}
                         />
 
                     </Accordion.Body>

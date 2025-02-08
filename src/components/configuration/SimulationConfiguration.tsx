@@ -30,7 +30,7 @@ const SimulationConfiguration = ({ eventKey, configuration, setConfiguration }: 
                 <RoundingInput
                     id="roundingInput"
                     label="Rounding"
-                    enabled={!configuration.avoidRounding}
+                    disabled={configuration.avoidRounding}
                     rounding={configuration.rounding}
                     onChange={(newValue: RoundingType) => {
                         setConfiguration(configuration.setRounding(newValue));

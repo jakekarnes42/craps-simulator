@@ -4,11 +4,12 @@ export type BooleanSwitchInputProps = {
     id: string,
     label: string,
     helpText: string,
-    value: boolean
-    onChange: (newValue: boolean) => void
+    value: boolean,
+    onChange: (newValue: boolean) => void,
+    disabled?: boolean,
 };
 
-const BooleanSwitchInput = ({ id, label, helpText, value, onChange }: BooleanSwitchInputProps): JSX.Element => {
+const BooleanSwitchInput = ({ id, label, helpText, value, onChange, disabled }: BooleanSwitchInputProps): JSX.Element => {
 
     return (
         <>
@@ -19,6 +20,7 @@ const BooleanSwitchInput = ({ id, label, helpText, value, onChange }: BooleanSwi
                     label={label}
                     checked={value}
                     onChange={(e) => { onChange(e.target.checked) }}
+                    disabled={disabled}
                 />
             </div>
             <div className='mb-0'>
