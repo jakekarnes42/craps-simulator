@@ -1,5 +1,6 @@
 import { round } from "../util/Util";
 import { OddsBetStrategy, OddsBetStrategyType } from "./OddsBetStrategy";
+import { PressStrategy } from "./PressStrategy";
 import { RoundingType } from "./RoundingType";
 
 interface ConfigurationProps {
@@ -28,7 +29,8 @@ interface ConfigurationProps {
     placeNumberBetsDuringComeOut: boolean;
     leaveNumberBetsWorkingDuringComeOut: boolean;
     omitNumberBetOnPoint: boolean;
-    leaveWinningNumberBetsWorking: boolean;
+    pressLimit: number | null;
+    pressStrategy: PressStrategy;
     avoidRounding: boolean;
     rounding: RoundingType;
     simulationCount: number | null;
@@ -60,7 +62,8 @@ export class Configuration {
     readonly placeNumberBetsDuringComeOut: boolean;
     readonly leaveNumberBetsWorkingDuringComeOut: boolean;
     readonly omitNumberBetOnPoint: boolean;
-    readonly leaveWinningNumberBetsWorking: boolean;
+    readonly pressLimit: number | null;
+    readonly pressStrategy: PressStrategy;
     readonly avoidRounding: boolean;
     readonly rounding: RoundingType;
     readonly simulationCount: number | null;
@@ -92,7 +95,8 @@ export class Configuration {
             placeNumberBetsDuringComeOut,
             leaveNumberBetsWorkingDuringComeOut,
             omitNumberBetOnPoint,
-            leaveWinningNumberBetsWorking,
+            pressLimit,
+            pressStrategy,
             avoidRounding,
             rounding,
             simulationCount
@@ -122,7 +126,8 @@ export class Configuration {
         this.placeNumberBetsDuringComeOut = placeNumberBetsDuringComeOut ?? false;
         this.leaveNumberBetsWorkingDuringComeOut = leaveNumberBetsWorkingDuringComeOut ?? false;
         this.omitNumberBetOnPoint = omitNumberBetOnPoint ?? true;
-        this.leaveWinningNumberBetsWorking = leaveWinningNumberBetsWorking ?? true;
+        this.pressLimit = pressLimit != null ? pressLimit : null;
+        this.pressStrategy = pressStrategy || PressStrategy.NO_PRESS;
         this.avoidRounding = avoidRounding;
         this.rounding = rounding;
         this.simulationCount = simulationCount ? round(simulationCount, RoundingType.DOLLAR) : simulationCount;
@@ -157,7 +162,8 @@ export class Configuration {
                 placeNumberBetsDuringComeOut: false,
                 leaveNumberBetsWorkingDuringComeOut: false,
                 omitNumberBetOnPoint: true,
-                leaveWinningNumberBetsWorking: true,
+                pressLimit: null, // Unlimited by default
+                pressStrategy: PressStrategy.NO_PRESS,
                 avoidRounding: true,
                 rounding: RoundingType.DOLLAR,
                 simulationCount: 10_000
@@ -265,9 +271,13 @@ export class Configuration {
     public setOmitNumberBetOnPoint(value: boolean): Configuration {
         return new Configuration({ ...this, omitNumberBetOnPoint: value });
     }
-    
-    public setLeaveWinningNumberBetsWorking(value: boolean): Configuration {
-        return new Configuration({ ...this, leaveWinningNumberBetsWorking: value });
+
+    public setPressLimit(value: number | null): Configuration {
+        return new Configuration({ ...this, pressLimit: value });
+    }
+
+    public setPressStrategy(value: PressStrategy): Configuration {
+        return new Configuration({ ...this, pressStrategy: value });
     }
 
     public setAvoidRounding(value: boolean): Configuration {
@@ -304,6 +314,10 @@ export class Configuration {
         return this.simulationCount != null && this.simulationCount > 0;
     }
 
+    public isPressLimitValid(): boolean {
+        return this.pressLimit === null || this.pressLimit >= 1;
+    }
+
     public getInvalidFields(): string[] {
         const fieldNames = [];
         if (!this.isInitialBankrollValid()) {
@@ -321,8 +335,11 @@ export class Configuration {
         if (!this.isSimulationCountValid()) {
             fieldNames.push('Simulation Count');
         }
+        if (!this.isPressLimitValid()) {
+            fieldNames.push('Press Limit (must be empty for unlimited or 1 or greater)');
+        }
         //Check that we have at least one bet:
-        if (this.passBet === null && this.comeBet === null && this.dontPassBet === null && this.dontComeBet === null) {
+        if (this.passBet === null && this.comeBet === null && this.dontPassBet === null && this.dontComeBet === null && this.numberBet4 === null && this.numberBet5 === null && this.numberBet6 === null && this.numberBet8 === null && this.numberBet9 === null && this.numberBet10 === null) {
             fieldNames.push('At least one bet must be configured.');
         }
         return fieldNames;

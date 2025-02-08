@@ -4,6 +4,9 @@ import { Configuration } from '../../game/Configuration';
 import BooleanSwitchInput from './BooleanSwitchInput';
 import NumericInput from './NumericInput';
 import { calculateNumberBetAvoidRounding } from '../../util/Util';
+import { ButtonGroup, Form } from 'react-bootstrap';
+import PressStrategyInput from './PressStrategyInput';
+import { PressStrategy } from '../../game/PressStrategy';
 
 type NumberBetsConfigurationProps = {
   eventKey: string;
@@ -166,13 +169,25 @@ export const NumberBetsConfiguration = ({
           }}
         />
 
-        <BooleanSwitchInput
-          id="leaveWinningNumberBetsWorking"
-          label="Leave Winning Number Bets Working"
-          helpText="If enabled, the original bet stays active after a win, and only the winnings are added to the bankroll. If disabled, both the bet and winnings are removed and added to the bankroll upon a win."
-          value={configuration.leaveWinningNumberBetsWorking}
-          onChange={(newValue: boolean) => {
-            setConfiguration(configuration.setLeaveWinningNumberBetsWorking(newValue));
+        <NumericInput
+          controlId="pressLimit"
+          label="Press Limit"
+          placeholder="Unlimited"
+          value={configuration.pressLimit}
+          helpText="Defines how many consecutive wins a number bet remains active before being removed. Leave empty for unlimited."
+          isValid={configuration.pressLimit === null || configuration.pressLimit >= 1}
+          invalidText="Must be empty (for unlimited) or a number 1 or greater."
+          handleChange={(newValue) => {
+            setConfiguration(configuration.setPressLimit(newValue));
+          }}
+        />
+
+        <PressStrategyInput
+          id="pressStrategy"
+          label="Press Strategy"
+          value={configuration.pressStrategy}
+          onChange={(newValue: PressStrategy) => {
+            setConfiguration(configuration.setPressStrategy(newValue));
           }}
         />
       </Accordion.Body>

@@ -35,7 +35,7 @@ const representNewBets = (newBets: PlacedBet[], newBankroll: number): ReactNode 
     <>
       {newBets.map((newBet, index) => {
         const betLabel =
-          newBet.type === 'Number Bet' && newBet.number !== undefined
+          newBet.type === BetType.NUMBER_BET && newBet.number !== undefined
             ? `New ${newBet.type} (${newBet.number})`
             : `New ${newBet.type}`;
         return (
@@ -51,129 +51,134 @@ const representNewBets = (newBets: PlacedBet[], newBankroll: number): ReactNode 
   );
 };
 
-const representResolvedBets = (resolvedBets: ResolvedBet[]): ReactNode => {
-  if (resolvedBets.length === 0) {
-    return <p className="mb-0">No bets resolved this roll.</p>;
-  }
-  return (
-    <>
-      {resolvedBets.map((resolvedBet, index) => (
-        <div key={index} className="mb-1">
-          <strong>{getBetLabel(resolvedBet.placedBet)}</strong> &nbsp;
-          (${resolvedBet.placedBet.bet}) &nbsp;
-          {renderOutcomeBadge(resolvedBet.outcome, resolvedBet.payout)}
-        </div>
-      ))}
-    </>
-  );
-};
-
-const representBetCollection = (currentBets: BetCollection, numberBetsActive: boolean): ReactNode => {
-  const { passLineBet, dontPassBet, comeBets, dontComeBets, numberBets } = currentBets;
-
-  const passLineDisplay = passLineBet && (
-    <li>
-      <strong>Pass Line Bet:</strong> ${passLineBet.bet}
-      {passLineBet.odds && <span> &mdash; <em>Odds:</em> ${passLineBet.odds}</span>}
-    </li>
-  );
-
-  const dontPassDisplay = dontPassBet && (
-    <li>
-      <strong>Don&apos;t Pass Bet:</strong> ${dontPassBet.bet}
-      {dontPassBet.odds && <span> &mdash; <em>Odds:</em> ${dontPassBet.odds}</span>}
-    </li>
-  );
-
-  const comeBetItems = comeBets.map((cb, i) => (
-    <li key={i}>
-      <strong>Come Bet:</strong> ${cb.bet}
-      {cb.comePoint && <span> &mdash; <em>Come Point:</em> {cb.comePoint}</span>}
-      {cb.odds && <span> &mdash; <em>Odds:</em> ${cb.odds}</span>}
-    </li>
-  ));
-
-  const dontComeBetItems = dontComeBets.map((dcb, i) => (
-    <li key={i}>
-      <strong>Don&apos;t Come Bet:</strong> ${dcb.bet}
-      {dcb.comePoint && <span> &mdash; <em>DC Point:</em> {dcb.comePoint}</span>}
-      {dcb.odds && <span> &mdash; <em>Odds:</em> ${dcb.odds}</span>}
-    </li>
-  ));
-
-  const numberBetItems = numberBets.map((nb, i) => (
-    <li key={i}>
-      <strong>Number Bet ({nb.number}){!numberBetsActive ? ' (Off)' : ''}:</strong> ${nb.wager}
-    </li>
-  ));
-
-  const hasBets =
-    passLineBet || dontPassBet || comeBets.length || dontComeBets.length || numberBets.length;
-
-  return hasBets ? (
-    <ul className="mb-0">
-      {passLineDisplay}
-      {dontPassDisplay}
-      {comeBetItems}
-      {dontComeBetItems}
-      {numberBetItems}
-    </ul>
-  ) : (
-    <p className="mb-0">No active bets.</p>
-  );
-};
-
-const renderPoint = (state: GameState): ReactNode =>
-  state.pointIsOn && state.point ? (
-    <p className="mb-0">
-      <strong>Point is on:</strong> {state.point}
-    </p>
-  ) : (
-    <p className="mb-0"><strong>Point is off.</strong></p>
-  );
-
-/**
- * Computes a descriptive label for the roll outcome.
- * - For a come‑out roll:
- *   - "Point Established" if a point is set in the resulting state.
- *   - "Natural" for a 7 or 11.
- *   - "Craps" for a 2, 3, or 12.
- * - For a point roll:
- *   - "Point Hit" if the roll equals the point.
- *   - "Seven Out" if the roll is 7.
- *   - "Point Roll" otherwise.
- */
-const getRollOutcomeLabel = (
-  initialState: GameState,
-  resultingState: GameState,
-  roll: number
-): string => {
-  if (!initialState.pointIsOn) {
-    if (resultingState.pointIsOn) {
-      return `Come Out Roll – Point Established (${resultingState.point})`;
-    } else if ([7, 11].includes(roll)) {
-      return 'Come Out Roll – Natural';
-    } else if ([2, 3, 12].includes(roll)) {
-      return 'Come Out Roll – Craps';
-    }
-    return 'Come Out Roll';
-  }
-  if (roll === initialState.point) {
-    return 'Point Hit';
-  }
-  if (roll === 7) {
-    return 'Seven Out';
-  }
-  return 'Point Roll';
-};
-
 export const SingleGameRollDisplay = ({ result }: SingleGameRollDisplayProps) => {
   const { initialState, newBets, placedBetState, roll, resolvedBets, resultingState } = result;
-  const rollOutcomeLabel = getRollOutcomeLabel(initialState, resultingState, roll);
 
-  // Determine if number bets are active during this particular roll.
-  const numberBetsActive =
-    placedBetState.pointIsOn || placedBetState.configuration.leaveNumberBetsWorkingDuringComeOut;
+  // Compute the roll outcome label (for example “Point Hit”, “Natural”, etc.)
+  const rollOutcomeLabel = (() => {
+    if (!initialState.pointIsOn) {
+      if (resultingState.pointIsOn) {
+        return `Come Out Roll – Point Established (${resultingState.point})`;
+      } else if ([7, 11].includes(roll)) {
+        return 'Come Out Roll – Natural';
+      } else if ([2, 3, 12].includes(roll)) {
+        return 'Come Out Roll – Craps';
+      }
+      return 'Come Out Roll';
+    }
+    if (roll === initialState.point) {
+      return 'Point Hit';
+    }
+    if (roll === 7) {
+      return 'Seven Out';
+    }
+    return 'Point Roll';
+  })();
+
+  // For number bets the “active” status is now determined by whether a point is on.
+  // (The previous “leaveNumberBetsWorkingDuringComeOut” setting is no longer used.)
+  const numberBetsActive = placedBetState.pointIsOn;
+
+  // Get the configuration (which now holds the press limit and press strategy)
+  const cfg = initialState.configuration;
+
+  // Update the display of the current bets to include (for number bets) the win count and press limit.
+  const representBetCollection = (currentBets: BetCollection, numberBetsActive: boolean): ReactNode => {
+    const { passLineBet, dontPassBet, comeBets, dontComeBets, numberBets } = currentBets;
+
+    const passLineDisplay = passLineBet && (
+      <li>
+        <strong>Pass Line Bet:</strong> ${passLineBet.bet}
+        {passLineBet.odds && <span> &mdash; <em>Odds:</em> ${passLineBet.odds}</span>}
+      </li>
+    );
+
+    const dontPassDisplay = dontPassBet && (
+      <li>
+        <strong>Don&apos;t Pass Bet:</strong> ${dontPassBet.bet}
+        {dontPassBet.odds && <span> &mdash; <em>Odds:</em> ${dontPassBet.odds}</span>}
+      </li>
+    );
+
+    const comeBetItems = comeBets.map((cb, i) => (
+      <li key={i}>
+        <strong>Come Bet:</strong> ${cb.bet}
+        {cb.comePoint && <span> &mdash; <em>Come Point:</em> {cb.comePoint}</span>}
+        {cb.odds && <span> &mdash; <em>Odds:</em> ${cb.odds}</span>}
+      </li>
+    ));
+
+    const dontComeBetItems = dontComeBets.map((dcb, i) => (
+      <li key={i}>
+        <strong>Don&apos;t Come Bet:</strong> ${dcb.bet}
+        {dcb.comePoint && <span> &mdash; <em>DC Point:</em> {dcb.comePoint}</span>}
+        {dcb.odds && <span> &mdash; <em>Odds:</em> ${dcb.odds}</span>}
+      </li>
+    ));
+
+    const numberBetItems = numberBets.map((nb, i) => {
+      // Show the win count and the configured press limit (or “Unlimited” if none was set)
+      let pressInfo = "";
+      if (cfg.pressLimit !== null) {
+        pressInfo = ` (Wins: ${nb.winCount} / ${cfg.pressLimit})`;
+      } else {
+        pressInfo = ` (Wins: ${nb.winCount} / Unlimited)`;
+      }
+      return (
+        <li key={i}>
+          <strong>Number Bet ({nb.number}){!numberBetsActive ? ' (Off)' : ''}:</strong> ${nb.wager}{pressInfo}
+        </li>
+      );
+    });
+
+    const hasBets =
+      passLineBet || dontPassBet || comeBets.length || dontComeBets.length || numberBets.length;
+
+    return hasBets ? (
+      <ul className="mb-0">
+        {passLineDisplay}
+        {dontPassDisplay}
+        {comeBetItems}
+        {dontComeBetItems}
+        {numberBetItems}
+      </ul>
+    ) : (
+      <p className="mb-0">No active bets.</p>
+    );
+  };
+
+  // Update the resolved bets display so that if a number bet was removed because it hit its press limit,
+  // an extra badge appears.
+  const representResolvedBets = (resolvedBets: ResolvedBet[]): ReactNode => {
+    if (resolvedBets.length === 0) {
+      return <p className="mb-0">No bets resolved this roll.</p>;
+    }
+    return (
+      <>
+        {resolvedBets.map((resolvedBet, index) => (
+          <div key={index} className="mb-1">
+            <strong>{getBetLabel(resolvedBet.placedBet)}</strong> &nbsp;
+            (${resolvedBet.placedBet.bet}) &nbsp;
+            {renderOutcomeBadge(resolvedBet.outcome, resolvedBet.payout)}
+            {resolvedBet.placedBet.type === BetType.NUMBER_BET &&
+              resolvedBet.placedBet.number !== undefined &&
+              resultingState.cashedOutNumbers.includes(resolvedBet.placedBet.number) && (
+                <Badge bg="info" className="ms-1">Cashed Out (Press Limit)</Badge>
+              )}
+          </div>
+        ))}
+      </>
+    );
+  };
+
+  const renderPoint = (state: GameState): ReactNode =>
+    state.pointIsOn && state.point ? (
+      <p className="mb-0">
+        <strong>Point is on:</strong> {state.point}
+      </p>
+    ) : (
+      <p className="mb-0"><strong>Point is off.</strong></p>
+    );
 
   return (
     <div className="row border mb-3 p-3">

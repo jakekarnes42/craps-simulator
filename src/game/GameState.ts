@@ -22,6 +22,7 @@ export interface ComeBet extends Bet {
 export interface NumberBet {
     number: 4 | 5 | 6 | 8 | 9 | 10;
     wager: number;
+    winCount: number; //Tracks how many times this particular number bet has won consecutively.
 }
 
 export type BetCollection = {

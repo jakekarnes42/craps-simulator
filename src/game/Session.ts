@@ -2,6 +2,7 @@ import { calculateNumberBetAvoidRounding, calculateOddsBetAmountAvoidRounding, r
 import { Configuration } from "./Configuration";
 import { BetCollection, GameState, NumberBet } from "./GameState";
 import { OddsBetStrategy, OddsBetStrategyType } from "./OddsBetStrategy";
+import { PressStrategy } from "./PressStrategy";
 import { RoundingType } from "./RoundingType";
 
 /**
@@ -176,32 +177,23 @@ function placeBets(
         }
     }
 
-    //3) Place or maintain number bets (4,5,6,8,9,10)
-    // --- Place or maintain number bets (4, 5, 6, 8, 9, 10)
+    // 3) Place or maintain number bets (4,5,6,8,9,10)
     if (!pointIsOn) {
-        // Come‑out roll: place bets only if allowed.
+        // On a come‑out roll, only place number bets if allowed.
         if (cfg.placeNumberBetsDuringComeOut) {
             const result = placeNewNumberBetsForCycle(cfg, pointIsOn, point, cashedOutNumbers, currentBets, bankroll);
             newBets.push(...result.newBets);
             currentBets = result.currentBets;
             bankroll = result.bankroll;
         }
-        // Clear out cashedOutNumbers because the table is resetting.
+        // Clear out cashedOutNumbers since the table resets on come‑out.
         cashedOutNumbers.length = 0;
     } else {
-        if (cfg.leaveWinningNumberBetsWorking) {
-            // When enabled, simply fill in any missing bets.
-            const result = placeNewNumberBetsForCycle(cfg, pointIsOn, point, cashedOutNumbers, currentBets, bankroll);
-            newBets.push(...result.newBets);
-            currentBets = result.currentBets;
-            bankroll = result.bankroll;
-        } else {
-            // When disabled, only place missing bets that were not cashed out last roll.
-            const result = placeNewNumberBetsForCycle(cfg, pointIsOn, point, cashedOutNumbers, currentBets, bankroll, true);
-            newBets.push(...result.newBets);
-            currentBets = result.currentBets;
-            bankroll = result.bankroll;
-        }
+        // When the point is on, do not re‐place any bet that was removed (e.g. due to press limit).
+        const result = placeNewNumberBetsForCycle(cfg, pointIsOn, point, cashedOutNumbers, currentBets, bankroll, true);
+        newBets.push(...result.newBets);
+        currentBets = result.currentBets;
+        bankroll = result.bankroll;
     }
 
     const placedBetState = new GameState({
@@ -427,7 +419,7 @@ function placeNewNumberBetsForCycle(
         }
         if (canPlaceBet(bankroll, amountWithRounding, cfg.bankrollMinimum)) {
             bankroll -= amountWithRounding;
-            currentBets.numberBets.push({ number, wager: amountWithRounding });
+            currentBets.numberBets.push({ number, wager: amountWithRounding, winCount: 0 });
             newBets.push({ type: BetType.NUMBER_BET, bet: amountWithRounding, number });
         }
     }
@@ -913,36 +905,138 @@ function resolveNumberBets(
     const updatedNumberBets: NumberBet[] = [];
     for (const nb of currentBets.numberBets) {
         if (roll === nb.number) {
-            // Compute the standard Vegas payoff.
+            // The bet won:
+            // 1) calculate payoff based on standard place/buy rules
             const payoff = calculateNumberBetPayoff(nb.wager, nb.number, cfg.rounding);
-            if (cfg.leaveWinningNumberBetsWorking) {
-                // Leave the bet on the table; add only the profit.
-                bankroll += payoff;
+
+            // 2) apply press strategy to see how much goes back onto the bet
+            const { updatedBetSize, netToBankroll } = applyPressStrategy(
+                nb.wager,
+                payoff,
+                nb.number,
+                cfg.pressStrategy
+            );
+
+            // 3) Add leftover portion to bankroll
+            bankroll += netToBankroll;
+
+            // 4) increment the bet’s consecutive‐wins count
+            nb.winCount++;
+
+            // 5) check pressLimit to see if we remove it
+            if (cfg.pressLimit !== null && nb.winCount >= cfg.pressLimit) {
+                // Reached the limit => remove the bet from the table
+                // Typically you get the entire final bet back if you remove it
+                bankroll += updatedBetSize;
+
                 resolvedBets.push({
                     placedBet: { type: BetType.NUMBER_BET, bet: nb.wager, number: nb.number },
                     outcome: BetOutcome.WIN,
-                    payout: payoff
+                    payout: payoff,
                 });
-                updatedNumberBets.push({ ...nb });
-            } else {
-                // Cash out the bet entirely.
-                bankroll += (payoff + nb.wager);
-                resolvedBets.push({
-                    placedBet: { type: BetType.NUMBER_BET, bet: nb.wager, number: nb.number },
-                    outcome: BetOutcome.WIN,
-                    payout: payoff
-                });
-                // Record that this number’s bet was cashed out so we don’t immediately replace it.
+
                 cashedOut.push(nb.number);
-                // Do not push nb; it is removed.
+            } else {
+                // Remain on the table pressed up
+                nb.wager = updatedBetSize;
+
+                resolvedBets.push({
+                    placedBet: { type: BetType.NUMBER_BET, bet: nb.wager, number: nb.number },
+                    outcome: BetOutcome.WIN,
+                    payout: payoff,
+                });
+
+                updatedNumberBets.push(nb);
             }
         } else {
-            // Bet does not win; leave it working.
+            // Not a winning roll => just keep the bet as is
             updatedNumberBets.push(nb);
         }
     }
     currentBets.numberBets = updatedNumberBets;
     return { bankroll, currentBets, resolvedBets, cashedOut };
+}
+
+/**
+ * Applies the chosen press strategy to a winning number bet. 
+ * 
+ * @param currentBet   The bet size prior to this win
+ * @param payoff       The amount won on this roll
+ * @param number       4,5,6,8,9,10
+ * @param strategy     NO_PRESS, HALF_PRESS, FULL_PRESS, POWER_PRESS
+ * @returns            updatedBetSize, netToBankroll
+ */
+function applyPressStrategy(
+    currentBet: number,
+    payoff: number,
+    number: 4 | 5 | 6 | 8 | 9 | 10,
+    strategy: PressStrategy
+): { updatedBetSize: number; netToBankroll: number } {
+    switch (strategy) {
+        case PressStrategy.NO_PRESS:
+            // All winnings to bankroll
+            return {
+                updatedBetSize: currentBet,
+                netToBankroll: payoff
+            };
+
+        case PressStrategy.HALF_PRESS:
+            // 50% of payoff to the bet; the rest to bankroll
+            const half = payoff / 2;
+            return {
+                updatedBetSize: currentBet + half,
+                netToBankroll: payoff - half
+            };
+
+        case PressStrategy.FULL_PRESS:
+            // All payoff is reinvested
+            return {
+                updatedBetSize: currentBet + payoff,
+                netToBankroll: 0
+            };
+
+        case PressStrategy.POWER_PRESS:
+            // Attempt to press the entire payoff but snap to a "clean multiple"
+            // so future payouts won't be fractional (and not to exceed payoff).
+            const maxPossible = currentBet + payoff;
+            const finalPressed = floorDownToProperUnit(maxPossible, number);
+            return {
+                updatedBetSize: finalPressed,
+                netToBankroll: maxPossible - finalPressed
+            };
+
+        default:
+            // Fallback
+            return {
+                updatedBetSize: currentBet,
+                netToBankroll: payoff
+            };
+    }
+}
+
+/**
+ * For "Power Press," we pick the largest multiple that doesn't exceed `amount`.
+ * E.g. multiples of 6 for 6/8; multiples of 5 for 5/9; multiples of 20 or 5 for 4/10, etc.
+ */
+function floorDownToProperUnit(
+    amount: number,
+    number: 4 | 5 | 6 | 8 | 9 | 10
+): number {
+    if (number === 6 || number === 8) {
+        return amount - (amount % 6);
+    }
+    if (number === 5 || number === 9) {
+        return amount - (amount % 5);
+    }
+    // For 4 & 10: if >= 20 => buy bets in increments of 20, else place bet increments of 5
+    if (number === 4 || number === 10) {
+        if (amount >= 20) {
+            return amount - (amount % 20);
+        } else {
+            return amount - (amount % 5);
+        }
+    }
+    return amount;
 }
 
 /**
