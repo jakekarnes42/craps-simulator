@@ -123,3 +123,28 @@ function ceilToNearestMultiple(original: number, divisor: number) {
         return divisor * (quotient + 1); // Round up to nearest multiple
     }
 }
+
+/**
+ * For "Power Press," we pick the largest multiple that doesn't exceed `amount`.
+ * E.g. multiples of 6 for 6/8; multiples of 5 for 5/9; multiples of 20 or 5 for 4/10, etc.
+ */
+export function floorDownToProperUnit(
+    amount: number,
+    number: 4 | 5 | 6 | 8 | 9 | 10
+): number {
+    if (number === 6 || number === 8) {
+        return amount - (amount % 6);
+    }
+    if (number === 5 || number === 9) {
+        return amount - (amount % 5);
+    }
+    // For 4 & 10: if >= 20 => buy bets in increments of 20, else place bet increments of 5
+    if (number === 4 || number === 10) {
+        if (amount >= 20) {
+            return amount - (amount % 20);
+        } else {
+            return amount - (amount % 5);
+        }
+    }
+    return amount;
+}
