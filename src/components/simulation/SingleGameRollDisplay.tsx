@@ -318,7 +318,7 @@ export const SingleGameRollDisplay = ({ result }: SingleGameRollDisplayProps) =>
       {/* Row Heading: Roll number, outcome, and dice total */}
       <div className="col-12 mb-2">
         <h5 className="m-0">
-          Roll #{initialState.rollNum} &nbsp;
+          Roll #{initialState.rollNum+1 /* the +1 makes it one-indexed */} &nbsp; 
           <small className="text-muted">
             ({rollOutcomeLabel}) – Dice Total: {roll}
           </small>
