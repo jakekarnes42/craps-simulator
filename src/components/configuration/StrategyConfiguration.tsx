@@ -174,7 +174,7 @@ const StrategyConfiguration = ({ eventKey, configuration, setConfiguration }: St
                         <BooleanSwitchInput
                             id="dontComeBetOddsWorkingComeOutInput"
                             label="Don't Come Bet Odds Working During Come Out Roll"
-                            helpText={"This setting configures whether don't come odds bets are working during the come out roll. By default, don't come bet odds are assumed to be off during the come out roll unless the player tells the dealer otherwise."}
+                            helpText={"This setting configures whether don't come odds bets are working during the come out roll. By default, don't come bet odds are assumed to be working during the come out roll unless the player tells the dealer otherwise."}
                             value={configuration.dontComeBetOddsWorkingComeOut}
                             onChange={(newValue: boolean) => {
                                 setConfiguration(configuration.setDontComeBetOddsWorkingComeOut(newValue));
