@@ -152,7 +152,7 @@ export class Configuration {
                 dontComeBet: null,
                 maxDontComeBets: 3,
                 dontComeBetOddsStrategy: { type: OddsBetStrategyType.NONE, value: 1 },
-                dontComeBetOddsWorkingComeOut: false,
+                dontComeBetOddsWorkingComeOut: true,
                 numberBet4: null,
                 numberBet5: null,
                 numberBet6: null,
