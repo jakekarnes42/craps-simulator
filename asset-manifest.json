@@ -1,16 +1,16 @@
 {
   "files": {
-    "main.css": "/craps-simulator/static/css/main.be5d7b71.css",
-    "main.js": "/craps-simulator/static/js/main.4731e5f5.js",
-    "static/js/107.dabe67bf.chunk.js": "/craps-simulator/static/js/107.dabe67bf.chunk.js",
-    "static/js/bulkGame.worker.71b8abd4.js": "/craps-simulator/static/js/bulkGame.worker.71b8abd4.js",
+    "main.css": "/craps-simulator/static/css/main.7e9f60a5.css",
+    "main.js": "/craps-simulator/static/js/main.cb4c271d.js",
+    "static/js/358.1b0e0a8a.chunk.js": "/craps-simulator/static/js/358.1b0e0a8a.chunk.js",
+    "static/js/bulkGame.worker.8f3da68a.js": "/craps-simulator/static/js/bulkGame.worker.8f3da68a.js",
     "index.html": "/craps-simulator/index.html",
-    "main.be5d7b71.css.map": "/craps-simulator/static/css/main.be5d7b71.css.map",
-    "main.4731e5f5.js.map": "/craps-simulator/static/js/main.4731e5f5.js.map",
-    "107.dabe67bf.chunk.js.map": "/craps-simulator/static/js/107.dabe67bf.chunk.js.map"
+    "main.7e9f60a5.css.map": "/craps-simulator/static/css/main.7e9f60a5.css.map",
+    "main.cb4c271d.js.map": "/craps-simulator/static/js/main.cb4c271d.js.map",
+    "358.1b0e0a8a.chunk.js.map": "/craps-simulator/static/js/358.1b0e0a8a.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.be5d7b71.css",
-    "static/js/main.4731e5f5.js"
+    "static/css/main.7e9f60a5.css",
+    "static/js/main.cb4c271d.js"
   ]
 }
