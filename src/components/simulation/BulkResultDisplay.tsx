@@ -1,4 +1,5 @@
 import { GameState, LimitReached } from '../../game/GameState';
+import { useTheme } from '../../theme/ThemeContext';
 import { computeHistogramData, computeSummaryStats, median } from '../../util/StatUtil';
 import { TableSpeed, convertToTwoDecimalPlaceString, rollsToReadableDuration } from '../../util/Util';
 import { Accordion } from 'react-bootstrap';
@@ -11,6 +12,9 @@ type BulkResultDisplayProps = {
 }
 
 export const BulkResultDisplay = ({ results }: BulkResultDisplayProps) => {
+  // Use our theme to select appropriate colors
+  const { theme } = useTheme();
+
   const totalCount = results.length;
   if (totalCount === 0) {
     return (<></>);
@@ -61,6 +65,13 @@ export const BulkResultDisplay = ({ results }: BulkResultDisplayProps) => {
   const bustedCount = results.filter(r => r.limitReached() === LimitReached.BUSTED).length;
   const maxRollsCount = results.filter(r => r.limitReached() === LimitReached.MAX_ROLLS).length;
 
+
+  const isDark = theme === 'dark';
+  const axisColor = isDark ? "#888" : "#ccc";
+  const textColor = isDark ? "#fff" : "#000";
+  const barFillColor = isDark ? "#4a90e2" : "#8884d8";
+  const tooltipCursorFill = isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)";
+
   // Custom tooltip component for Recharts showing count and percentage.
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
@@ -70,9 +81,10 @@ export const BulkResultDisplay = ({ results }: BulkResultDisplayProps) => {
         <div
           className="custom-tooltip"
           style={{
-            backgroundColor: '#fff',
+            backgroundColor: isDark ? '#333' : '#fff',
+            color: textColor,
             padding: '5px',
-            border: '1px solid #ccc'
+            border: isDark ? "1px solid #555" : "1px solid #ccc"
           }}
         >
           <p>{label}</p>
@@ -123,11 +135,11 @@ export const BulkResultDisplay = ({ results }: BulkResultDisplayProps) => {
               <div style={{ width: '100%', height: 300 }}>
                 <ResponsiveContainer>
                   <BarChart data={bankrollHistogramData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="binLabel" />
-                    <YAxis />
-                    <Tooltip content={CustomTooltip} />
-                    <Bar dataKey="count" fill="#8884d8" />
+                    <CartesianGrid strokeDasharray="3 3" stroke={axisColor} />
+                    <XAxis dataKey="binLabel" stroke={textColor} />
+                    <YAxis stroke={textColor} />
+                    <Tooltip content={CustomTooltip} cursor={{ fill: tooltipCursorFill }} />
+                    <Bar dataKey="count" fill={barFillColor} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
@@ -155,11 +167,11 @@ export const BulkResultDisplay = ({ results }: BulkResultDisplayProps) => {
               <div style={{ width: '100%', height: 300 }}>
                 <ResponsiveContainer>
                   <BarChart data={rollHistogramData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="binLabel" />
-                    <YAxis />
-                    <Tooltip content={CustomTooltip} />
-                    <Bar dataKey="count" fill="#82ca9d" />
+                    <CartesianGrid strokeDasharray="3 3" stroke={axisColor} />
+                    <XAxis dataKey="binLabel" stroke={textColor} />
+                    <YAxis stroke={textColor} />
+                    <Tooltip content={CustomTooltip} cursor={{ fill: tooltipCursorFill }} />
+                    <Bar dataKey="count" fill={barFillColor} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>

@@ -15,6 +15,7 @@ import {
   convertToTwoDecimalPlaceString,
 } from '../../util/Util';
 import { SingleGameRollDisplay } from './SingleGameRollDisplay';
+import { useTheme } from '../../theme/ThemeContext';
 
 /**
  * Props for the SingleGameResultDisplay component.
@@ -93,6 +94,8 @@ const computeBestStreak = (
  * @param results - An array of RollResult objects from the simulation.
  */
 export const SingleGameResultDisplay: React.FC<SingleGameResultDisplayProps> = ({ results }) => {
+  const { theme } = useTheme();
+
   // If there are no results, render nothing.
   if (results.length === 0) {
     return null;
@@ -147,6 +150,12 @@ export const SingleGameResultDisplay: React.FC<SingleGameResultDisplayProps> = (
   const minBankrollEntry = bankrollHistoryChart.reduce((min, current) =>
     current.bankroll < min.bankroll ? current : min, bankrollHistoryChart[0]);
 
+  const isDark = theme === 'dark';
+  const axisColor = isDark ? "#888" : "#ccc";
+  const textColor = isDark ? "#fff" : "#000";
+  const lineColor = isDark ? "#4a90e2" : "#8884d8";
+  const tooltipCursorFill = isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)";
+
   /**
    * Custom tooltip for the bankroll evolution chart.
    */
@@ -157,9 +166,10 @@ export const SingleGameResultDisplay: React.FC<SingleGameResultDisplayProps> = (
         <div
           className="custom-tooltip"
           style={{
-            backgroundColor: '#fff',
+            backgroundColor: isDark ? '#333' : '#fff',
+            color: textColor,
             padding: '5px',
-            border: '1px solid #ccc',
+            border: isDark ? "1px solid #555" : "1px solid #ccc",
           }}
         >
           <p>
@@ -250,14 +260,15 @@ export const SingleGameResultDisplay: React.FC<SingleGameResultDisplayProps> = (
       <div style={{ width: '100%', height: 300, margin: '20px 0' }}>
         <ResponsiveContainer>
           <LineChart data={bankrollHistoryChart}>
-            <CartesianGrid strokeDasharray="3 3" />
+            <CartesianGrid strokeDasharray="3 3" stroke={axisColor} />
             <XAxis
               dataKey="roll"
               label={{ value: 'Roll Number', position: 'insideBottomRight', offset: -5 }}
+              stroke={textColor}
             />
-            <YAxis label={{ value: 'Bankroll', angle: -90, position: 'insideLeft' }} />
-            <Tooltip content={<CustomTooltip />} />
-            <Line type="monotone" dataKey="bankroll" stroke="#8884d8" />
+            <YAxis label={{ value: 'Bankroll', angle: -90, position: 'insideLeft' }} stroke={textColor} />
+            <Tooltip content={<CustomTooltip />} cursor={{ fill: tooltipCursorFill }} />
+            <Line type="monotone" dataKey="bankroll" stroke={lineColor} />
           </LineChart>
         </ResponsiveContainer>
       </div>
