@@ -2,12 +2,16 @@ import { RoundingType } from "../game/RoundingType";
 
 const humanizeDuration = require('humanize-duration');
 
+export const SLOW_SECONDS_PER_ROLL = 60;
+export const AVG_SECONDS_PER_ROLL = 45;
+export const FAST_SECONDS_PER_ROLL = 30;
+
 export enum TableSpeed {
     //Table Speed <-> number of seconds per roll * milliseconds
     //These are just estimates that can be adjusted with better data
-    Slow = 45 * 1000,
-    Average = 30 * 1000,
-    Fast = 24 * 1000
+    Slow = SLOW_SECONDS_PER_ROLL * 1000,
+    Average = AVG_SECONDS_PER_ROLL * 1000,
+    Fast = FAST_SECONDS_PER_ROLL * 1000
 }
 
 export function rollsToReadableDuration(numRolls: number | null, speed: TableSpeed) {

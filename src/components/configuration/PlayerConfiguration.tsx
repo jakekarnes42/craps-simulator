@@ -1,7 +1,7 @@
 import { Dispatch, SetStateAction } from 'react';
 import Accordion from 'react-bootstrap/Accordion';
 import { Configuration } from '../../game/Configuration';
-import { rollsToReadableDuration, TableSpeed } from '../../util/Util';
+import { AVG_SECONDS_PER_ROLL, FAST_SECONDS_PER_ROLL, rollsToReadableDuration, SLOW_SECONDS_PER_ROLL, TableSpeed } from '../../util/Util';
 import NumericInput from './NumericInput'
 
 export type PlayerConfigurationProps = {
@@ -75,9 +75,9 @@ const PlayerConfiguration = ({ eventKey, configuration, setConfiguration }: Play
                 />
                 <small className="text-muted">
                     <ul>
-                        <li><b>Slow table:</b> Approx. {rollsToReadableDuration(configuration.maximumRolls, TableSpeed.Slow)}.</li>
-                        <li><b>Average table:</b> Approx. {rollsToReadableDuration(configuration.maximumRolls, TableSpeed.Average)}.</li>
-                        <li><b>Fast table:</b> Approx. {rollsToReadableDuration(configuration.maximumRolls, TableSpeed.Fast)}.</li>
+                        <li><b>Slow table ({SLOW_SECONDS_PER_ROLL} seconds per roll):</b> Approx. {rollsToReadableDuration(configuration.maximumRolls, TableSpeed.Slow)}.</li>
+                        <li><b>Average table ({AVG_SECONDS_PER_ROLL} seconds per roll):</b> Approx. {rollsToReadableDuration(configuration.maximumRolls, TableSpeed.Average)}.</li>
+                        <li><b>Fast table: ({FAST_SECONDS_PER_ROLL} seconds per roll)</b> Approx. {rollsToReadableDuration(configuration.maximumRolls, TableSpeed.Fast)}.</li>
                     </ul>
                 </small>
 
