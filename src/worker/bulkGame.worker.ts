@@ -6,11 +6,7 @@ declare const self: DedicatedWorkerGlobalScope;
 export default {} as typeof Worker & { new(): Worker };
 
 self.onmessage = async ($event: MessageEvent) => {
-    console.log("Handling event");
     if ($event && $event.data) {
-        console.log("Matched event");
-        console.log("Starting simulation");
-
         //Convert configuration back into a proper class instance.
         //It gets boiled down to JSON in the message passing.
         const configuration = new Configuration($event.data.configuration);
@@ -30,7 +26,7 @@ self.onmessage = async ($event: MessageEvent) => {
             }
         }
 
+        //All done. Send results
         self.postMessage(results);
-        console.log("All done");
     }
 };

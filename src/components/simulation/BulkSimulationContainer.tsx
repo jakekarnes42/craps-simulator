@@ -22,16 +22,13 @@ export const BulkSimulationContainer = ({ configuration }: BulkSimulationContain
 
   //Execute this side effect only when simulationState changes
   useEffect(() => {
-    console.log("Running simulation change useEffect");
     //If we've transitioned into a Running state
     if (simulationState === SimulationState.RUNNING) {
       //Clear past results
       setResults([]);
       setCompleted(0);
 
-      //Create a new worker
-      console.log("Launching workers");
-
+      //Create new workers
       for (let i = 0; i < navigator.hardwareConcurrency; i++) {
 
         const worker: Worker = new BulkGameWorker();
@@ -41,8 +38,6 @@ export const BulkSimulationContainer = ({ configuration }: BulkSimulationContain
           if ($event && $event.data === "1000 complete") {
             setCompleted(completed => completed + 1000)
           } else if ($event && $event.data) {
-            console.log("New results from worker. Updating list");
-
             const workerOutput = $event.data;
             const workerResults = workerOutput.map((workerResult: { rollNum: number; bankroll: number; point: number; pointIsOn: boolean; currentBets: BetCollection; cashedOutNumbers: (4 | 5 | 6 | 8 | 9 | 10)[]}) => {
               return new GameState(
@@ -73,7 +68,6 @@ export const BulkSimulationContainer = ({ configuration }: BulkSimulationContain
 
     //If we've transitioned into a Completed state
     if (simulationState === SimulationState.COMPLETE) {
-      console.log("Simulation cancelled. Terminating workers");
       workers.forEach(worker => worker.terminate()); // Terminate all workers
       setWorkers([]); // Clear worker list
     }
@@ -81,7 +75,7 @@ export const BulkSimulationContainer = ({ configuration }: BulkSimulationContain
 
     //Return a clean up function in case component is unmounted or simulationState changes
     return () => {
-      console.log("Terminating workers in cleanup");
+      //Execute cleanup by terminating workers
       workers.forEach(worker => { worker.terminate() });
     }
 
@@ -89,9 +83,8 @@ export const BulkSimulationContainer = ({ configuration }: BulkSimulationContain
 
   //Execute this side effect only when results change
   useEffect(() => {
-    console.log("Running results change useEffect");
     if (results.length === simulationTotal) {
-      console.log("All results collected");
+      //Update state after all results collected
       setSimulationState(SimulationState.COMPLETE);
     }
   }, [results]);

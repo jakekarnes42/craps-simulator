@@ -18,7 +18,6 @@ export const SingleSimulationContainer = ({ configuration }: SingleSimulationCon
 
   //Execute this side effect only when simulationState changes
   useEffect(() => {
-    console.log("Running use effect");
     //If we've transitioned into a Running state
     if (simulationState === SimulationState.RUNNING) {
       //Clear past results
