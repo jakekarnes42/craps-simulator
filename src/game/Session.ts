@@ -873,11 +873,10 @@ function resolveLineAndComeBets(
 
 /**
  * Resolve any placed number bets (4,5,6,8,9,10).
- * Standard Vegas approach:
- *  - 4/10: buy bet once $20 or above; 2:1 payoff minus 5% vig on the bet, only if it wins
- *    if under $20, place bet pays 9:5
- *  - 5/9: place pays 7:5
- *  - 6/8: place pays 7:6
+ * Follows Wizard of Odds simplified approach:
+ *  - 4/10: buy/place pays 39:20
+ *  - 5/9: buy/place pays 7:5
+ *  - 6/8: buy/place pays 7:6
  * If roll=7 => all lose. 
  */
 function resolveNumberBets(
@@ -1035,45 +1034,40 @@ function cloneBetCollection(bets: BetCollection): BetCollection {
 }
 
 /**
- * Calculates the payoff for a bet on 4,5,6,8,9,10 using standard Vegas approach:
- * - For 4 or 10:
- *   - If bet >= $20, treat it like a Buy bet => 2:1 minus 5% vig on the bet if you win
- *   - If bet < $20, treat it like a Place bet => 9:5
- * - For 5 or 9: place pays 7:5
- * - For 6 or 8: place pays 7:6
- *
- * The vig is collected only if the bet wins. 
+ * Calculates the payoff for a bet on 4,5,6,8,9,10 using Wizard of Odds simplification of Place and Buy bets approach:
+ * - For 4 or 10: pays 39:20
+ * - For 5 or 9:  pays 7:5
+ * - For 6 or 8:  pays 7:6
  */
 function calculateNumberBetPayoff(
     bet: number,
     number: number,
     rounding: RoundingType
 ): number {
+    let ratio: number;
     switch (number) {
         case 4:
         case 10:
-            if (bet >= 20) {
-                //Buy bet -> 2:1 minus 5% vig on the bet
-                const rawWin = bet * 2;
-                // Usually at least $1 in vig, but it depends. We'll do a standard round approach
-                const vig = round(0.05 * bet, rounding);
-                return rawWin - vig;
-            } else {
-                //Place bet -> 9:5
-                return round((bet * 9) / 5, rounding);
-            }
+            // Wizard-of-Odds combined buy: 39:20 => 1.95
+            ratio = 1.95;
+            break;
         case 5:
         case 9:
-            //Place bet -> 7:5
-            return round((bet * 7) / 5, rounding);
+            // 7:5 => 1.4
+            ratio = 1.4;
+            break;
         case 6:
         case 8:
-            //Place bet -> 7:6
-            return round((bet * 7) / 6, rounding);
+            // 7:6 => approx 1.1667
+            ratio = 7 / 6;
+            break;
         default:
             return 0;
     }
+    const rawWin = bet * ratio;
+    return round(rawWin, rounding);
 }
+
 
 /**
  * Helper to compute pass line odds payout for a point (4=2:1,5=3:2,6=6:5, etc.)
@@ -1141,3 +1135,4 @@ function canPlaceBet(
 function rollDie(): number {
     return Math.floor(Math.random() * 6) + 1;
 }
+

@@ -80,36 +80,28 @@ export function calculateNumberBetAvoidRounding(
     plannedBet: number,
     number: 4 | 5 | 6 | 8 | 9 | 10
 ): number {
-    // If the user’s “planned bet” is zero or negative, or no bet is intended, skip:
+    // If the user’s “planned bet” is zero or negative, skip.
     if (plannedBet <= 0) {
         return plannedBet;
     }
 
-    // For 4 & 10, if bet >= 20 treat as a "Buy" bet (2:1 minus 5% vig). 
-    // We want 0.05 * bet to be an integer → bet must be multiple of 20 for no rounding.
-    // If bet < 20 treat as a "Place" bet paying 9:5, so bet must be multiple of 5 to avoid fractional payoff.
-    if (number === 4 || number === 10) {
-        if (plannedBet >= 20) {
-            // “Buy Bet” → must be multiple of 20 to ensure the vig is an integer
+    switch (number) {
+        case 4:
+        case 10:
+            // Always use ratio = 39/20 for 4/10 => to avoid fractional payoff, 
+            // the bet must be a multiple of 20.
             return ceilToNearestMultiple(plannedBet, 20);
-        } else {
-            // “Place Bet” → 9/5 payoff → must be multiple of 5
+
+        case 5:
+        case 9:
+            // Pays 7:5 => bet must be multiple of 5
             return ceilToNearestMultiple(plannedBet, 5);
-        }
-    }
 
-    // For 5 & 9: place pays 7:5 → to avoid fractional payoff, bet must be multiple of 5
-    if (number === 5 || number === 9) {
-        return ceilToNearestMultiple(plannedBet, 5);
+        case 6:
+        case 8:
+            // Pays 7:6 => bet must be multiple of 6
+            return ceilToNearestMultiple(plannedBet, 6);
     }
-
-    // For 6 & 8: place pays 7:6 → to avoid fractional payoff, bet must be multiple of 6
-    if (number === 6 || number === 8) {
-        return ceilToNearestMultiple(plannedBet, 6);
-    }
-
-    // Fallback
-    return plannedBet;
 }
 
 function ceilToNearestMultiple(original: number, divisor: number) {

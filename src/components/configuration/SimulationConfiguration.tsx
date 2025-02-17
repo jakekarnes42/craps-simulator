@@ -21,7 +21,7 @@ const SimulationConfiguration = ({ eventKey, configuration, setConfiguration }: 
                 <BooleanSwitchInput
                     id="avoidRoundingInput"
                     label="Increase Bet to Avoid Rounding"
-                    helpText={"This setting configures whether bets are increased to avoid rounding losses."}
+                    helpText={"This setting configures whether bets are increased to avoid rounding losses. If enabled, the bet amount is automatically adjusted to an integer multiple that results in a clean integer payoff (no rounding). For example, \"buying\" the 4/10 must be a multiple of $20 for a completely rounded payoff."}
                     value={configuration.avoidRounding}
                     onChange={(newValue: boolean) => {
                         setConfiguration(configuration.setAvoidRounding(newValue));

@@ -55,9 +55,19 @@ export const NumberBetsConfiguration = ({
     <Accordion.Item eventKey={eventKey}>
       <Accordion.Header>Number Bets</Accordion.Header>
       <Accordion.Body>
-        <p>
-          Configure your bets for numbers 4, 5, 6, 8, 9, and 10 below.
-          Enter a positive bet amount to bet on that number, or leave blank to disable it.
+        <p className="mb-2">
+          You can make bets on the numbers 4, 5, 6, 8, 9, and 10. Enter a positive amount for each number to enable that bet, or leave it blank to skip.
+        </p>
+        <p className="mb-2">
+          In this simulator, we combine “place” and “buy” bets into a single, simplified “buy‐style” bet that always pays the best possible rate for each number:
+        </p>
+        <ul className="mb-2">
+          <li><strong>4 or 10</strong> pay <em>39:20</em> (about 1.95 × your bet)</li>
+          <li><strong>5 or 9</strong> pay <em>7:5</em> (1.4 × your bet)</li>
+          <li><strong>6 or 8</strong> pay <em>7:6</em> (about 1.167 × your bet)</li>
+        </ul>
+        <p className="mb-2">
+          This approach automatically grants the better odds of a “buy” bet without requiring you to choose between “place” or “buy.” If you enable “Increase Bet to Avoid Rounding,” your bet amounts are adjusted slightly so your win payouts become clean whole numbers.
         </p>
 
         <NumericInput
