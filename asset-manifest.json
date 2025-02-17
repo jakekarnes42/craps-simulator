@@ -1,14 +1,14 @@
 {
   "files": {
     "main.css": "/craps-simulator/static/css/main.7e9f60a5.css",
-    "main.js": "/craps-simulator/static/js/main.1efc6d93.js",
-    "static/js/bulkGame.worker.8f3da68a.js": "/craps-simulator/static/js/bulkGame.worker.8f3da68a.js",
+    "main.js": "/craps-simulator/static/js/main.ade9d9a7.js",
+    "static/js/bulkGame.worker.89978c1e.js": "/craps-simulator/static/js/bulkGame.worker.89978c1e.js",
     "index.html": "/craps-simulator/index.html",
     "main.7e9f60a5.css.map": "/craps-simulator/static/css/main.7e9f60a5.css.map",
-    "main.1efc6d93.js.map": "/craps-simulator/static/js/main.1efc6d93.js.map"
+    "main.ade9d9a7.js.map": "/craps-simulator/static/js/main.ade9d9a7.js.map"
   },
   "entrypoints": [
     "static/css/main.7e9f60a5.css",
-    "static/js/main.1efc6d93.js"
+    "static/js/main.ade9d9a7.js"
   ]
 }
