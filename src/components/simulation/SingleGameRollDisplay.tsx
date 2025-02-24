@@ -2,7 +2,7 @@ import { ReactNode } from 'react';
 import { Badge } from 'react-bootstrap';
 import { BetCollection, GameState } from '../../game/GameState';
 import { BetOutcome, BetType, PlacedBet, ResolvedBet, RollResult } from '../../game/Session';
-import { PressStrategy } from '../../game/PressStrategy';
+import { PressStrategy, PressStrategyType } from '../../game/PressStrategy';
 import { floorDownToProperUnit } from '../../util/Util';
 
 type SingleGameRollDisplayProps = {
@@ -93,19 +93,29 @@ const calculatePressDetails = (
 ): { pressIncrease: number; bankrollReturn: number } => {
   // Total value after win
   const total = originalBet + payoff;
-  switch (pressStrategy) {
-    case PressStrategy.NO_PRESS:
+  switch (pressStrategy.type) {
+    case PressStrategyType.NO_PRESS:
       // No pressing – all winnings return to the bankroll.
       return { pressIncrease: 0, bankrollReturn: payoff };
-    case PressStrategy.HALF_PRESS: {
+    case PressStrategyType.PRESS_UNTIL: {
+      // Press only until the bet reaches the target.
+      // The target amount is stored in the strategy’s value field.
+      const target = pressStrategy.value
+      if (total <= target) {
+        return { pressIncrease: payoff, bankrollReturn: 0 };
+      } else {
+        return { pressIncrease: target - originalBet, bankrollReturn: total - target };
+      }
+    }
+    case PressStrategyType.HALF_PRESS: {
       // Half of the winnings are pressed; half returned.
       const half = payoff / 2;
       return { pressIncrease: half, bankrollReturn: payoff - half };
     }
-    case PressStrategy.FULL_PRESS:
+    case PressStrategyType.FULL_PRESS:
       // Full pressing – entire win is added to the bet.
       return { pressIncrease: payoff, bankrollReturn: 0 };
-    case PressStrategy.POWER_PRESS: {
+    case PressStrategyType.POWER_PRESS: {
       // Press up to the next optimal casino multiple.
       const maxPossible = originalBet + payoff;
       const finalPressed = floorDownToProperUnit(maxPossible, betNumber);
@@ -269,7 +279,7 @@ export const SingleGameRollDisplay = ({ result }: SingleGameRollDisplayProps) =>
                 resolvedBet.outcome === BetOutcome.WIN &&
                 resolvedBet.placedBet.number !== undefined &&
                 !isCashedOut &&
-                cfg.pressStrategy !== PressStrategy.NO_PRESS && (
+                cfg.pressStrategy.type !== PressStrategyType.NO_PRESS && (
                   <div className="ms-3">
                     <small>
                       {(() => {
@@ -318,7 +328,7 @@ export const SingleGameRollDisplay = ({ result }: SingleGameRollDisplayProps) =>
       {/* Row Heading: Roll number, outcome, and dice total */}
       <div className="col-12 mb-2">
         <h5 className="m-0">
-          Roll #{initialState.rollNum+1 /* the +1 makes it one-indexed */} &nbsp; 
+          Roll #{initialState.rollNum + 1 /* the +1 makes it one-indexed */} &nbsp;
           <small className="text-muted">
             ({rollOutcomeLabel}) – Dice Total: {roll}
           </small>

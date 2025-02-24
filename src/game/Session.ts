@@ -2,7 +2,7 @@ import { calculateNumberBetAvoidRounding, calculateOddsBetAmountAvoidRounding, f
 import { Configuration } from "./Configuration";
 import { BetCollection, GameState, NumberBet } from "./GameState";
 import { OddsBetStrategy, OddsBetStrategyType } from "./OddsBetStrategy";
-import { PressStrategy } from "./PressStrategy";
+import { PressStrategy, PressStrategyType } from "./PressStrategy";
 import { RoundingType } from "./RoundingType";
 
 /**
@@ -971,15 +971,32 @@ function applyPressStrategy(
     number: 4 | 5 | 6 | 8 | 9 | 10,
     strategy: PressStrategy
 ): { updatedBetSize: number; netToBankroll: number } {
-    switch (strategy) {
-        case PressStrategy.NO_PRESS:
+    switch (strategy.type) {
+        case PressStrategyType.NO_PRESS:
             // All winnings to bankroll
             return {
                 updatedBetSize: currentBet,
                 netToBankroll: payoff
             };
-
-        case PressStrategy.HALF_PRESS:
+        case PressStrategyType.PRESS_UNTIL: {
+            // Press until the bet reaches the target amount.
+            // Retrieve the target value from the strategy object.
+            const target = strategy.value;
+            if (currentBet + payoff <= target) {
+                // Entire win pressed if target is not reached.
+                return {
+                    updatedBetSize: currentBet + payoff,
+                    netToBankroll: 0
+                };
+            } else {
+                // Press only enough to reach the target.
+                return {
+                    updatedBetSize: target,
+                    netToBankroll: currentBet + payoff - target
+                };
+            }
+        }
+        case PressStrategyType.HALF_PRESS:
             // 50% of payoff to the bet; the rest to bankroll
             const half = payoff / 2;
             return {
@@ -987,14 +1004,14 @@ function applyPressStrategy(
                 netToBankroll: payoff - half
             };
 
-        case PressStrategy.FULL_PRESS:
+        case PressStrategyType.FULL_PRESS:
             // All payoff is reinvested
             return {
                 updatedBetSize: currentBet + payoff,
                 netToBankroll: 0
             };
 
-        case PressStrategy.POWER_PRESS:
+        case PressStrategyType.POWER_PRESS:
             // Attempt to press the entire payoff but snap to a "clean multiple"
             // so future payouts won't be fractional (and not to exceed payoff).
             const maxPossible = currentBet + payoff;

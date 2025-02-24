@@ -1,7 +1,7 @@
 import { Dispatch, SetStateAction } from 'react';
 import Accordion from 'react-bootstrap/Accordion';
 import { Configuration } from '../../game/Configuration';
-import { PressStrategy } from '../../game/PressStrategy';
+import { PressStrategyType } from '../../game/PressStrategy';
 import { calculateNumberBetAvoidRounding } from '../../util/Util';
 import BooleanSwitchInput from './BooleanSwitchInput';
 import NumericInput from './NumericInput';
@@ -193,9 +193,9 @@ export const NumberBetsConfiguration = ({
         <PressStrategyInput
           id="pressStrategy"
           label="Press Strategy"
-          value={configuration.pressStrategy}
-          onChange={(newValue: PressStrategy) => {
-            setConfiguration(configuration.setPressStrategy(newValue));
+          strategy={configuration.pressStrategy}
+          onChange={(newStrategy) => {
+            setConfiguration(configuration.setPressStrategy(newStrategy));
           }}
           disabled={!isNumberBetsActive}
         />
