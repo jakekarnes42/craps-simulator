@@ -150,7 +150,7 @@ export const BulkResultDisplay = ({ results }: BulkResultDisplayProps) => {
   });
   const sortedDeathRolls = [...deathRolls].sort((a,b)=>a-b);
   const survivalData = [];
-  const maxRollsCurve = Math.max(...rollNumbers);
+  const maxRollsCurve = rollNumbers.reduce((a, b) => Math.max(a, b), 0);
   const step = Math.max(1, Math.floor(maxRollsCurve / 100));
   for(let i=0; i<=maxRollsCurve; i+=step) {
       const survived = sortedDeathRolls.filter(death => death > i).length;

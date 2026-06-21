@@ -1,4 +1,6 @@
 import { Configuration } from "./Configuration";
+import { BetCollection, BetType } from "./Session";
+import { calculateNumberBetAvoidRounding } from "../util/Util";
 
 interface GameStateProps {
     configuration: Configuration;
@@ -49,53 +51,61 @@ export class GameState {
     readonly currentBets: BetCollection;
     readonly cashedOutNumbers: Array<4 | 5 | 6 | 8 | 9 | 10>;
 
-    constructor(
-        {
-            configuration,
-            rollNum,
-            bankroll,
-            point,
-            pointIsOn,
-            currentBets,
-            cashedOutNumbers,
-        }: GameStateProps) {
-        this.configuration = configuration;
-        this.rollNum = rollNum;
-        this.bankroll = bankroll;
-        this.point = point;
-        this.pointIsOn = pointIsOn;
-        this.currentBets = currentBets;
-        this.cashedOutNumbers = cashedOutNumbers;
+    constructor(params: {
+        configuration: Configuration;
+        rollNum: number;
+        bankroll: number;
+        currentBets: BetCollection;
+        point: number;
+        pointIsOn: boolean;
+        cashedOutNumbers?: Array<4 | 5 | 6 | 8 | 9 | 10>;
+    }) {
+        this.configuration = params.configuration;
+        this.rollNum = params.rollNum;
+        this.bankroll = params.bankroll;
+        this.currentBets = params.currentBets;
+        this.point = params.point;
+        this.pointIsOn = params.pointIsOn;
+        this.cashedOutNumbers = params.cashedOutNumbers ?? [];
     }
 
     static init(configuration: Configuration) {
-        if (configuration.getInvalidFields().length !== 0 || configuration.initialBankroll === null) {
+        if (configuration.getInvalidFields().length > 0) {
             throw new Error(`Cannot start game from invalid configuration: ${JSON.stringify(configuration)}`);
-
         }
 
-        return new GameState(
-            {
-                configuration: configuration,
-                rollNum: 0,
-                bankroll: configuration.initialBankroll,
-                point: 0,
-                pointIsOn: false,
-                currentBets: { passLineBet: null, dontPassBet: null, comeBets: [], dontComeBets: [], numberBets: [] },
-                cashedOutNumbers: []
-            });
+        return new GameState({
+            configuration,
+            rollNum: 0,
+            bankroll: configuration.initialBankroll,
+            currentBets: { passLineBet: null, dontPassBet: null, comeBets: [], dontComeBets: [], numberBets: [] },
+            point: 0,
+            pointIsOn: false,
+            cashedOutNumbers: []
+        });
     }
 
+    /**
+     * Are there ANY active bets on the table right now?
+     */
+    get isActive(): boolean {
+        return this.hasCurrentBet();
+    }
+
+    /**
+     * Determines if the simulation is completely over.
+     */
     isDone(): boolean {
-        //Check if there's a current bet. If there's a current bet, we won't be done. Gotta play it out
-        if (this.hasCurrentBet()) {
-            return false;
-        }
+        //If we haven't hit a limit, we keep playing.
+        if (this.limitReached() === null) return false;
 
-        //Check if we've reached some other limit.
-        return this.limitReached() !== null;
+        //We've hit a limit. We can only stop if we have no more bets on the table.
+        return !this.hasCurrentBet();
     }
 
+    /**
+     * Determines if the simulation should stop because a configured limit was hit
+     */
     limitReached(): LimitReached | null {
 
         //The minimum is set and we hit it
@@ -155,16 +165,21 @@ export class GameState {
         if (cfg.dontComeBet && cfg.dontComeBet > 0) possibleBets.push(cfg.dontComeBet);
 
         // Number bets. We should consider the smallest among 4,5,6,8,9,10 if set
-        const nb4 = cfg.numberBet4 ?? 0;
-        const nb5 = cfg.numberBet5 ?? 0;
-        const nb6 = cfg.numberBet6 ?? 0;
-        const nb8 = cfg.numberBet8 ?? 0;
-        const nb9 = cfg.numberBet9 ?? 0;
-        const nb10 = cfg.numberBet10 ?? 0;
+        const numBets = [
+            { val: cfg.numberBet4, num: 4 }, { val: cfg.numberBet5, num: 5 },
+            { val: cfg.numberBet6, num: 6 }, { val: cfg.numberBet8, num: 8 },
+            { val: cfg.numberBet9, num: 9 }, { val: cfg.numberBet10, num: 10 }
+        ];
 
-        [nb4, nb5, nb6, nb8, nb9, nb10].forEach((x) => {
-            if (x > 0) possibleBets.push(x);
-        });
+        for (const nb of numBets) {
+            if (nb.val && nb.val > 0) {
+                let cost = nb.val;
+                if (cfg.avoidRounding) {
+                    cost = calculateNumberBetAvoidRounding(cost, nb.num as any);
+                }
+                possibleBets.push(cost);
+            }
+        }
 
         if (possibleBets.length === 0) {
             // If truly nothing is > 0, then there's no minimal bet. But

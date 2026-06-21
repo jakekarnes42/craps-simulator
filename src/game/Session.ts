@@ -105,7 +105,7 @@ export function executeSingleRoll(initialState: GameState): RollResult {
     const roll = firstDie + secondDie;
 
     //Phase 3: Resolve bets
-    const { resultingState, resolvedBets } = resolveBets(placedBetState, roll);
+    let { resultingState, resolvedBets } = resolveBets(placedBetState, roll);
 
     return {
         initialState,
