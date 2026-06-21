@@ -6,6 +6,7 @@ import { BetCollection, GameState } from '../../game/GameState';
 import { BulkResultDisplay } from './BulkResultDisplay';
 import { SimulationButton } from './SimulationButton';
 import { SimulationState } from './SimulationState';
+import { SessionAnalytics } from '../../game/Session';
 
 type BulkSimulationContainerProps = {
   configuration: Configuration,
@@ -15,7 +16,7 @@ export const BulkSimulationContainer = ({ configuration }: BulkSimulationContain
 
   const [simulationState, setSimulationState] = useState(SimulationState.READY);
   const [completed, setCompleted] = useState(0);
-  const [results, setResults] = useState<Array<GameState>>([]);
+  const [results, setResults] = useState<Array<SessionAnalytics>>([]);
   const [workers, setWorkers] = useState<Array<Worker>>([]);
 
   const simulationTotal = configuration.simulationCount ? configuration.simulationCount : 1;
@@ -39,18 +40,23 @@ export const BulkSimulationContainer = ({ configuration }: BulkSimulationContain
             setCompleted(completed => completed + 1000)
           } else if ($event && $event.data) {
             const workerOutput = $event.data;
-            const workerResults = workerOutput.map((workerResult: { rollNum: number; bankroll: number; point: number; pointIsOn: boolean; currentBets: BetCollection; cashedOutNumbers: (4 | 5 | 6 | 8 | 9 | 10)[]}) => {
-              return new GameState(
+            const workerResults = workerOutput.map((workerResult: any) => {
+              const fs = workerResult.finalState;
+              const gameState = new GameState(
                 {
                   configuration,
-                  rollNum: workerResult.rollNum,
-                  bankroll: workerResult.bankroll,
-                  point: workerResult.point,
-                  pointIsOn: workerResult.pointIsOn,
-                  currentBets: workerResult.currentBets,
-                  cashedOutNumbers: workerResult.cashedOutNumbers
+                  rollNum: fs.rollNum,
+                  bankroll: fs.bankroll,
+                  point: fs.point,
+                  pointIsOn: fs.pointIsOn,
+                  currentBets: fs.currentBets,
+                  cashedOutNumbers: fs.cashedOutNumbers
                 }
-              )
+              );
+              return {
+                ...workerResult,
+                finalState: gameState
+              } as SessionAnalytics;
             });
 
             setResults(results => [...results, ...workerResults]);

@@ -67,6 +67,15 @@ export type RollResult = {
     resultingState: GameState;
 };
 
+export interface SessionAnalytics {
+    finalState: GameState;
+    rollCount: number;
+    maxDrawdown: number;
+    sevenOutCount: number;
+    totalSevenOutWipe: number;
+    betAttribution: Record<BetType, { won: number; lost: number }>;
+}
+
 /**
  * Execute a single roll of the dice:
  * 1) Place bets according to the user's strategy.
