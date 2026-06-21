@@ -1,7 +1,7 @@
 import { Dispatch, SetStateAction } from 'react';
 import Accordion from 'react-bootstrap/Accordion';
 import { Configuration } from '../../game/Configuration';
-import { PressStrategyType } from '../../game/PressStrategy';
+
 import { calculateNumberBetAvoidRounding } from '../../util/Util';
 import BooleanSwitchInput from './BooleanSwitchInput';
 import NumericInput from './NumericInput';

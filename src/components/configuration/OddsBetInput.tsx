@@ -133,13 +133,13 @@ const OddsBetInput = ({ id, label, controllingBetValue, avoidRounding, rounding,
             <div className='mb-0'>
                 <ButtonGroup id={`${id}-buttongroup`}>
                     <Form.Check.Input type='radio' bsPrefix='btn-check' disabled={isDisabled} checked={!isDisabled && strategy.type === OddsBetStrategyType.NONE} readOnly />
-                    <Form.Check.Label bsPrefix='btn btn-outline-primary' onClick={(e) => { onChange({ type: OddsBetStrategyType.NONE, value: strategy.value }) }}>{OddsBetStrategyType.NONE}</Form.Check.Label>
+                    <Form.Check.Label bsPrefix='btn btn-outline-primary' onClick={() => { onChange({ type: OddsBetStrategyType.NONE, value: strategy.value }) }}>{OddsBetStrategyType.NONE}</Form.Check.Label>
                     <Form.Check.Input type='radio' bsPrefix='btn-check' disabled={isDisabled} checked={!isDisabled && strategy.type === OddsBetStrategyType.SETAMOUNT} readOnly />
-                    <Form.Check.Label bsPrefix='btn btn-outline-primary' onClick={(e) => { onChange({ type: OddsBetStrategyType.SETAMOUNT, value: strategy.value }) }}>{OddsBetStrategyType.SETAMOUNT}</Form.Check.Label>
+                    <Form.Check.Label bsPrefix='btn btn-outline-primary' onClick={() => { onChange({ type: OddsBetStrategyType.SETAMOUNT, value: strategy.value }) }}>{OddsBetStrategyType.SETAMOUNT}</Form.Check.Label>
                     <Form.Check.Input type='radio' bsPrefix='btn-check' disabled={isDisabled} checked={!isDisabled && strategy.type === OddsBetStrategyType.MULTIPLIER} readOnly />
-                    <Form.Check.Label bsPrefix='btn btn-outline-primary' onClick={(e) => { onChange({ type: OddsBetStrategyType.MULTIPLIER, value: strategy.value }) }}>{OddsBetStrategyType.MULTIPLIER}</Form.Check.Label>
+                    <Form.Check.Label bsPrefix='btn btn-outline-primary' onClick={() => { onChange({ type: OddsBetStrategyType.MULTIPLIER, value: strategy.value }) }}>{OddsBetStrategyType.MULTIPLIER}</Form.Check.Label>
                     <Form.Check.Input type='radio' bsPrefix='btn-check' disabled={isDisabled} checked={!isDisabled && strategy.type === OddsBetStrategyType.TABLEMAX} readOnly />
-                    <Form.Check.Label bsPrefix='btn btn-outline-primary' onClick={(e) => { onChange({ type: OddsBetStrategyType.TABLEMAX, value: strategy.value }) }}>{OddsBetStrategyType.TABLEMAX}</Form.Check.Label>
+                    <Form.Check.Label bsPrefix='btn btn-outline-primary' onClick={() => { onChange({ type: OddsBetStrategyType.TABLEMAX, value: strategy.value }) }}>{OddsBetStrategyType.TABLEMAX}</Form.Check.Label>
                 </ButtonGroup>
             </div>
             <div className='mb-0'>

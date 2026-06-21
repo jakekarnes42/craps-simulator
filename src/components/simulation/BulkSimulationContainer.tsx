@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import { Configuration } from '../../game/Configuration';
 import { BetCollection, GameState } from '../../game/GameState';
-import BulkGameWorker from '../../worker/bulkGame.worker';
+
 import { BulkResultDisplay } from './BulkResultDisplay';
 import { SimulationButton } from './SimulationButton';
 import { SimulationState } from './SimulationState';
@@ -31,7 +31,7 @@ export const BulkSimulationContainer = ({ configuration }: BulkSimulationContain
       //Create new workers
       for (let i = 0; i < navigator.hardwareConcurrency; i++) {
 
-        const worker: Worker = new BulkGameWorker();
+        const worker: Worker = new Worker(new URL('../../worker/bulkGame.worker.ts', import.meta.url), { type: 'module' });
         //Setup message handler for data coming from the worker
         worker.onmessage = ($event: MessageEvent) => {
           //Handle new data coming back from the worker. 

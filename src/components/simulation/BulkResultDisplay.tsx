@@ -136,7 +136,7 @@ function computeHistogramData(
   const binSize = (maxValue - minValue) / binCount;
   const bins = new Array(binCount).fill(0).map(() => ({ count: 0 }));
 
-  let currentIndex = 0;
+
   for (let i = 0; i < n; i++) {
     const val = sorted[i];
     // If val == maxValue, put it in the last bin to avoid rounding issues

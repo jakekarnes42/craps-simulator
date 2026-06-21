@@ -32,19 +32,19 @@ const MaxComeBetsInput = ({ id, label, controllingBetValue, maxBets, onChange }:
             <div className='mb-0'>
                 <ButtonGroup id={`${id}-buttongroup`}>
                     <Form.Check.Input type='radio' bsPrefix='btn-check' disabled={isDisabled} checked={!isDisabled && maxBets === 1} readOnly />
-                    <Form.Check.Label bsPrefix='btn btn-outline-primary' onClick={(e) => { onChange(1) }}>1</Form.Check.Label>
+                    <Form.Check.Label bsPrefix='btn btn-outline-primary' onClick={() => { onChange(1) }}>1</Form.Check.Label>
                     <Form.Check.Input type='radio' bsPrefix='btn-check' disabled={isDisabled} checked={!isDisabled && maxBets === 2} readOnly />
-                    <Form.Check.Label bsPrefix='btn btn-outline-primary' onClick={(e) => { onChange(2) }}>2</Form.Check.Label>
+                    <Form.Check.Label bsPrefix='btn btn-outline-primary' onClick={() => { onChange(2) }}>2</Form.Check.Label>
                     <Form.Check.Input type='radio' bsPrefix='btn-check' disabled={isDisabled} checked={!isDisabled && maxBets === 3} readOnly />
-                    <Form.Check.Label bsPrefix='btn btn-outline-primary' onClick={(e) => { onChange(3) }}>3</Form.Check.Label>
+                    <Form.Check.Label bsPrefix='btn btn-outline-primary' onClick={() => { onChange(3) }}>3</Form.Check.Label>
                     <Form.Check.Input type='radio' bsPrefix='btn-check' disabled={isDisabled} checked={!isDisabled && maxBets === 4} readOnly />
-                    <Form.Check.Label bsPrefix='btn btn-outline-primary' onClick={(e) => { onChange(4) }}>4</Form.Check.Label>
+                    <Form.Check.Label bsPrefix='btn btn-outline-primary' onClick={() => { onChange(4) }}>4</Form.Check.Label>
                     <Form.Check.Input type='radio' bsPrefix='btn-check' disabled={isDisabled} checked={!isDisabled && maxBets === 5} readOnly />
-                    <Form.Check.Label bsPrefix='btn btn-outline-primary' onClick={(e) => { onChange(5) }}>5</Form.Check.Label>
+                    <Form.Check.Label bsPrefix='btn btn-outline-primary' onClick={() => { onChange(5) }}>5</Form.Check.Label>
                     <Form.Check.Input type='radio' bsPrefix='btn-check' disabled={isDisabled} checked={!isDisabled && maxBets === 6} readOnly />
-                    <Form.Check.Label bsPrefix='btn btn-outline-primary' onClick={(e) => { onChange(6) }}>6</Form.Check.Label>
+                    <Form.Check.Label bsPrefix='btn btn-outline-primary' onClick={() => { onChange(6) }}>6</Form.Check.Label>
                     <Form.Check.Input type='radio' bsPrefix='btn-check' disabled={isDisabled} checked={!isDisabled && maxBets === 7} readOnly />
-                    <Form.Check.Label bsPrefix='btn btn-outline-primary' onClick={(e) => { onChange(7) }}>7</Form.Check.Label>
+                    <Form.Check.Label bsPrefix='btn btn-outline-primary' onClick={() => { onChange(7) }}>7</Form.Check.Label>
                 </ButtonGroup>
             </div>
             <div className='mb-3'>

@@ -450,8 +450,7 @@ function resolveBets(
         bankroll,
         currentBets,
         pointIsOn,
-        point,
-        resolvedBets
+        point
     );
     bankroll = lineResult.bankroll;
     currentBets = lineResult.currentBets;
@@ -545,8 +544,7 @@ function resolveLineAndComeBets(
     bankroll: number,
     currentBets: BetCollection,
     pointIsOn: boolean,
-    point: number,
-    incomingResolvedBets: ResolvedBet[]
+    point: number
 ): {
     bankroll: number;
     currentBets: BetCollection;
@@ -904,13 +902,14 @@ function resolveNumberBets(
     const updatedNumberBets: NumberBet[] = [];
     for (const nb of currentBets.numberBets) {
         if (roll === nb.number) {
+            const originalBet = nb.bet;
             // The bet won:
             // 1) calculate payoff based on standard place/buy rules
-            const payoff = calculateNumberBetPayoff(nb.bet, nb.number, cfg.rounding);
+            const payoff = calculateNumberBetPayoff(originalBet, nb.number, cfg.rounding);
 
             // 2) apply press strategy to see how much goes back onto the bet
             const { updatedBetSize, netToBankroll } = applyPressStrategy(
-                nb.bet,
+                originalBet,
                 payoff,
                 nb.number,
                 cfg.pressStrategy
@@ -929,7 +928,7 @@ function resolveNumberBets(
                 bankroll += updatedBetSize;
 
                 resolvedBets.push({
-                    placedBet: { type: BetType.NUMBER_BET, bet: nb.bet, number: nb.number },
+                    placedBet: { type: BetType.NUMBER_BET, bet: originalBet, number: nb.number },
                     outcome: BetOutcome.WIN,
                     payout: payoff,
                 });
@@ -940,7 +939,7 @@ function resolveNumberBets(
                 nb.bet = updatedBetSize;
 
                 resolvedBets.push({
-                    placedBet: { type: BetType.NUMBER_BET, bet: nb.bet, number: nb.number },
+                    placedBet: { type: BetType.NUMBER_BET, bet: originalBet, number: nb.number },
                     outcome: BetOutcome.WIN,
                     payout: payoff,
                 });

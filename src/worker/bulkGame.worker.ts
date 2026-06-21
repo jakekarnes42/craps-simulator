@@ -2,8 +2,7 @@ import { Configuration } from "../game/Configuration";
 import { GameState } from "../game/GameState";
 import { executeSingleRoll } from "../game/Session";
 
-declare const self: DedicatedWorkerGlobalScope;
-export default {} as typeof Worker & { new(): Worker };
+
 
 self.onmessage = async ($event: MessageEvent) => {
     if ($event && $event.data) {

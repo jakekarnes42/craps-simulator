@@ -1,6 +1,6 @@
 import { RoundingType } from "../game/RoundingType";
 
-const humanizeDuration = require('humanize-duration');
+import humanizeDuration from 'humanize-duration';
 
 export const SLOW_SECONDS_PER_ROLL = 60;
 export const AVG_SECONDS_PER_ROLL = 45;
