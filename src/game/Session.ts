@@ -908,12 +908,7 @@ function resolveNumberBets(
             const payoff = calculateNumberBetPayoff(originalBet, nb.number, cfg.rounding);
 
             // 2) apply press strategy to see how much goes back onto the bet
-            const { updatedBetSize, netToBankroll } = applyPressStrategy(
-                originalBet,
-                payoff,
-                nb.number,
-                cfg.pressStrategy
-            );
+            const { updatedBetSize, netToBankroll } = applyPressStrategy(cfg, nb.bet, payoff, nb.number, cfg.pressStrategy);
 
             // 3) Add leftover portion to bankroll
             bankroll += netToBankroll;
@@ -965,6 +960,7 @@ function resolveNumberBets(
  * @returns            updatedBetSize, netToBankroll
  */
 function applyPressStrategy(
+    cfg: Configuration,
     currentBet: number,
     payoff: number,
     number: 4 | 5 | 6 | 8 | 9 | 10,
@@ -983,34 +979,44 @@ function applyPressStrategy(
             const target = strategy.value;
             if (currentBet + payoff <= target) {
                 // Entire win pressed if target is not reached.
+                let targetBet = currentBet + payoff;
+                if (cfg.avoidRounding) targetBet = floorDownToProperUnit(targetBet, number);
                 return {
-                    updatedBetSize: currentBet + payoff,
-                    netToBankroll: 0
+                    updatedBetSize: targetBet,
+                    netToBankroll: (currentBet + payoff) - targetBet
                 };
             } else {
                 // Press only enough to reach the target.
+                let targetBet = target;
+                if (cfg.avoidRounding) targetBet = floorDownToProperUnit(targetBet, number);
                 return {
-                    updatedBetSize: target,
-                    netToBankroll: currentBet + payoff - target
+                    updatedBetSize: targetBet,
+                    netToBankroll: (currentBet + payoff) - targetBet
                 };
             }
         }
-        case PressStrategyType.HALF_PRESS:
+        case PressStrategyType.HALF_PRESS: {
             // 50% of payoff to the bet; the rest to bankroll
             const half = payoff / 2;
+            let targetBet = currentBet + half;
+            if (cfg.avoidRounding) targetBet = floorDownToProperUnit(targetBet, number);
             return {
-                updatedBetSize: currentBet + half,
-                netToBankroll: payoff - half
+                updatedBetSize: targetBet,
+                netToBankroll: (currentBet + payoff) - targetBet
             };
+        }
 
-        case PressStrategyType.FULL_PRESS:
+        case PressStrategyType.FULL_PRESS: {
             // All payoff is reinvested
+            let targetBet = currentBet + payoff;
+            if (cfg.avoidRounding) targetBet = floorDownToProperUnit(targetBet, number);
             return {
-                updatedBetSize: currentBet + payoff,
-                netToBankroll: 0
+                updatedBetSize: targetBet,
+                netToBankroll: (currentBet + payoff) - targetBet
             };
+        }
 
-        case PressStrategyType.POWER_PRESS:
+        case PressStrategyType.POWER_PRESS: {
             // Attempt to press the entire payoff but snap to a "clean multiple"
             // so future payouts won't be fractional (and not to exceed payoff).
             const maxPossible = currentBet + payoff;
@@ -1019,16 +1025,12 @@ function applyPressStrategy(
                 updatedBetSize: finalPressed,
                 netToBankroll: maxPossible - finalPressed
             };
-
+        }
+        
         default:
-            // Fallback
-            return {
-                updatedBetSize: currentBet,
-                netToBankroll: payoff
-            };
+            return { updatedBetSize: currentBet, netToBankroll: payoff };
     }
 }
-
 
 
 /**
