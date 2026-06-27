@@ -2,19 +2,15 @@
 
 In-browser application for bulk simulation of simple craps strategies. Live at [https://jakekarnes42.github.io/craps-simulator](https://jakekarnes42.github.io/craps-simulator). 
 
-## Launch Locally
+## Local Development
 
 ```bash
 npm install
 npm run dev
 ```
 
-Runs the app in the development mode.
-Open [http://localhost:5173/craps-simulator/](http://localhost:5173/craps-simulator/) to view it in the browser.
+Open [http://localhost:5173/craps-simulator/](http://localhost:5173/craps-simulator/) to view the local app.
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
-
-## Update GitHub pages version
+## Deploy
 
 `npm run deploy`
